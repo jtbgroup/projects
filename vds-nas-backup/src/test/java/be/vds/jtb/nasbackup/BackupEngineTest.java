@@ -9,12 +9,15 @@ import junit.framework.TestCase;
 public class BackupEngineTest extends TestCase {
 
 	private File originalSrcFolder;
+	private File destFolder;
 
 	@Override
 	protected void setUp() throws Exception {
 		originalSrcFolder = new File(
 				System.getProperty("user.home") + File.separatorChar + "temp" + File.separatorChar + "BackUpEngine");
 		File srcFolder = originalSrcFolder;
+		destFolder = new File(
+				System.getProperty("user.home") + File.separatorChar + "temp" + File.separatorChar + "BackUpEngineCopy");
 		srcFolder.mkdirs();
 		for (int i = 0; i < 50; i++) {
 			String fileName = "test_" + i + ".txt";
@@ -40,6 +43,8 @@ public class BackupEngineTest extends TestCase {
 		BackupEngine engine = new BackupEngine();
 		engine.setSrcFolder(originalSrcFolder);
 		assertEquals(54, engine.countAllFiles(originalSrcFolder));
+		engine.setDestFolder(destFolder);
+		engine.runEngine();
 	}
 
 	private void deleteFolder(File parentFolder) {

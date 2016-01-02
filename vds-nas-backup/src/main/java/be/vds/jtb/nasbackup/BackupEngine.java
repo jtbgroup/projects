@@ -36,14 +36,19 @@ public class BackupEngine {
 	 * @throws IOException
 	 */
 	private void copyFiles(File srcFolder, File destFolder) throws FileNotFoundException, IOException {
+		if(!destFolder.exists()){
+			destFolder.mkdirs();
+		}
+		
 		for (File child : srcFolder.listFiles()) {
 			if(child.isDirectory()){
 				File destFolderChild = new File(destFolder.getAbsolutePath()+File.separatorChar+child.getName());
 				destFolderChild.mkdir();
 				notifyListener(destFolder);
-				copyFiles(child, destFolder);
+				copyFiles(child, destFolderChild);
 			}else{
 				File destFile = new File(destFolder.getAbsolutePath()+File.separatorChar+child.getName());
+				destFile.createNewFile();
 				Files.copy(child.toPath(), new FileOutputStream(destFile));
 				notifyListener(destFile);
 			}
