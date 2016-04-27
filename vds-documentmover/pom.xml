@@ -15,12 +15,12 @@
 		<dependency>
 			<groupId>org.icepdf</groupId>
 			<artifactId>icepdf-core</artifactId>
-			<version>5.0.4</version>
+			<version>5.0.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.icepdf</groupId>
 			<artifactId>icepdf-viewer</artifactId>
-			<version>5.0.4</version>
+			<version>5.0.7</version>
 		</dependency>
 
 		<dependency>
