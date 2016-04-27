@@ -1,0 +1,89 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Test</title>
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+
+<script type="text/javascript">
+	var map;
+
+	function initialize() {
+		var mapCanvas = document.getElementById('map-canvas');
+		var mapOptions = {
+			center : new google.maps.LatLng(50.5403, 4.5463),
+			zoom : 9,
+			mapTypeId : google.maps.MapTypeId.ROADMAP
+		}
+		map = new google.maps.Map(mapCanvas, mapOptions);
+	}
+	google.maps.event.addDomListener(window, 'load', initialize);
+
+	function getLocation(address) {
+		var geocoder = new google.maps.Geocoder();
+		geocoder.geocode({
+			'address' : address
+		}, function(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {
+				var latitude = results[0].geometry.location.lat();
+				var longitude = results[0].geometry.location.lng();
+
+				var myLatlng = new google.maps.LatLng(latitude, longitude);
+
+				var marker = new google.maps.Marker({
+					position : myLatlng,
+					title : address
+				});
+				marker.setMap(map);
+			} else {
+				alert("Request failed.")
+			}
+		});
+	};
+
+	function fillMap() {
+		var fileVal=document.getElementById("file").value;
+		var Connect = new XMLHttpRequest();
+		Connect.open("GET", fileVal, false);
+		Connect.setRequestHeader("Content-Type", "text/xml");
+		Connect.send(null);
+		var TheDocument = Connect.responseXML;
+		x = TheDocument.getElementsByTagName("address");
+		for (var i = 0; i < x.length; i++) {
+			address = x[i].childNodes[0].nodeValue;
+			addAddressToMap(address);
+			addAddressToList(address);
+		}
+	}
+
+	function addAddressToMap(address) {
+		getLocation(address);
+	}
+	function addAddressToList(address) {
+		document.getElementById("addressList").innerHTML += address + "<br>";
+	}
+</script>
+<style>
+#map-canvas {
+	width: 90%;
+	height: 700px;
+	background-color: #CCC;
+	margin: auto;
+}
+</style>
+
+</head>
+<body>
+	<div>
+		<u>load XML:</u><br><input type="file" name="XML File" id="file"> <input
+			type="submit" onclick="fillMap()">
+	</div>
+	<br>
+	<div id="map-canvas"></div>
+	<br>
+	<div>
+		<u>List:</u>
+		<div id="addressList"></div>
+	</div>
+
+</body>
+</html>
