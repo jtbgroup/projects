@@ -43,7 +43,7 @@ public class DockingLayoutManager {
 		dock2.setVisible(true);
 		dock3.setLocation(CLocation.base().normalWest(0.20).south(0.5));
 		dock3.setVisible(true);
-		dock4.setLocation(CLocation.base().normalSouth(0.20));
+		dock4.setLocation(CLocation.base().normalSouth(0.3));
 		dock4.setVisible(true);
 
 		

@@ -62,7 +62,7 @@ public class Launcher implements ApplicationManager {
 			@Override
 			public void run() {
 //				frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-				frame.setSize(1000, 600);
+				frame.setSize(1300, 800);
 				frame.setLocationRelativeTo(null);
 				frame.setVisible(true);
 			}

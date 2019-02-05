@@ -43,6 +43,7 @@ public class MoverFrame extends JFrame {
 	private void intializeFrame() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setJMenuBar(createMenuBar());
+		this.setTitle("Document Manager");
 		addWindowListener(createWindowsListener());
 
 		initializeComponents();

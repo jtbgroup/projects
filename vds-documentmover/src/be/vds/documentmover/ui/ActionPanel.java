@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,43 +20,62 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
+
 import be.vds.documentmover.ConfigurationHelper;
 import be.vds.documentmover.utils.FileUtils;
+import be.vds.documentmover.utils.MyParser;
 
 public class ActionPanel extends JPanel {
-	private static final Logger LOGGER = Logger.getLogger(ActionPanel.class
-			.getName());
+	private static final Logger LOGGER = Logger.getLogger(ActionPanel.class.getName());
 	private JTextField destFolderLabel;
 	private DefaultComboBoxModel patternComboModel;
-	private JComboBox newFileNameComboBox;
+	private JComboBox senderComboBox;
 	private File sourceFile;
+	private JButton savePatternButton;
+	private JButton copySourceFileNameButton;
+	private JTextField dtgTextField;
+	private JTextField newFileNameTextField;
 
 	public ActionPanel() {
 		initializeComponents();
 	}
 
 	private void initializeComponents() {
+		createComponents();
 
 		GridBagLayout layout = new GridBagLayout();
 		this.setLayout(layout);
 		GridBagConstraints c = new GridBagConstraints();
 
-		GridBagLayoutManager.addComponent(this, new JLabel("Dest Folder"), c,
-				0, 0, 1, 1, 0, 0, GridBagConstraints.NONE,
+		GridBagLayoutManager.addComponent(this, new JLabel("Dest Folder"), c, 0, 0, 1, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.WEST);
-		GridBagLayoutManager
-				.addComponent(this, new JLabel("New Name"), c, 0, 1, 1, 1, 0,
-						0, GridBagConstraints.NONE, GridBagConstraints.WEST);
+		GridBagLayoutManager.addComponent(this, createDestFolderLabel(), c, 1, 0, 7, 1, 1, 0,
+				GridBagConstraints.HORIZONTAL, GridBagConstraints.WEST);
 
-		GridBagLayoutManager.addComponent(this, createDestFolderLabel(), c, 1,
-				0, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
+		int i = 0;
+		GridBagLayoutManager.addComponent(this, new JLabel("New Name"), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.WEST);
-		GridBagLayoutManager.addComponent(this, createNewFileNameTf(), c, 1, 1,
-				1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
-				GridBagConstraints.WEST);
+		GridBagLayoutManager.addComponent(this, dtgTextField, c, i++, 1, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
+				GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, new JLabel("_"), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
+				GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, senderComboBox, c, i++, 1, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
+				GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, new JLabel("_"), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
+				GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, newFileNameTextField, c, i++, 1, 1, 1, 1, 0,
+				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, savePatternButton, c, i++, 1, 1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
+				GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, copySourceFileNameButton, c, i++, 1, 1, 1, 0, 0,
+				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
 
-		GridBagLayoutManager.addComponent(this, createMoveButton(), c, 0, 2, 2,
-				1, 0, 0, GridBagConstraints.NONE, GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, createMoveButton(), c, 0, 2, 7, 1, 0, 0, GridBagConstraints.NONE,
+				GridBagConstraints.CENTER);
+		
+		GridBagLayoutManager.addComponent(this, Box.createVerticalGlue(), c, 0, 3, 7, 1, 1, 1, GridBagConstraints.BOTH,
+				GridBagConstraints.CENTER);
 	}
 
 	private Component createDestFolderLabel() {
@@ -66,21 +85,22 @@ public class ActionPanel extends JPanel {
 		return destFolderLabel;
 	}
 
-	private Component createNewFileNameTf() {
+	private void createComponents() {
+		dtgTextField = new JTextField();
+
+		newFileNameTextField = new JTextField();
+
 		patternComboModel = new DefaultComboBoxModel();
 		loadPatterns();
-		newFileNameComboBox = new JComboBox(patternComboModel);
-		newFileNameComboBox.setEditable(true);
+		senderComboBox = new JComboBox(patternComboModel);
+		senderComboBox.setEditable(true);
 
-		JButton savePatternButton = new JButton(new AbstractAction(
-				"Save pattern") {
+		savePatternButton = new JButton(new AbstractAction("Save pattern") {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String newPattern = (String) newFileNameComboBox
-						.getSelectedItem();
-				List<String> patterns = new LinkedList<String>(
-						ConfigurationHelper.getInstance().getFilePatterns());
+				String newPattern = (String) senderComboBox.getSelectedItem();
+				List<String> patterns = new LinkedList<String>(ConfigurationHelper.getInstance().getFilePatterns());
 				if (null == patterns) {
 					patterns = new LinkedList<String>();
 				}
@@ -97,8 +117,7 @@ public class ActionPanel extends JPanel {
 			}
 		});
 
-		JButton copySourceFileNameButton = new JButton(new AbstractAction(
-				"Source name") {
+		copySourceFileNameButton = new JButton(new AbstractAction("Source name") {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -106,27 +125,26 @@ public class ActionPanel extends JPanel {
 			}
 		});
 
-		JPanel p = new JPanel();
-		GridBagLayout layout = new GridBagLayout();
-		p.setLayout(layout);
-		GridBagConstraints c = new GridBagConstraints();
-
-		GridBagLayoutManager.addComponent(p, newFileNameComboBox, c, 0, 0, 1,
-				1, 1, 0, GridBagConstraints.HORIZONTAL,
-				GridBagConstraints.CENTER);
-		GridBagLayoutManager.addComponent(p, savePatternButton, c, 1, 0, 1, 1,
-				0, 0, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
-		GridBagLayoutManager.addComponent(p, copySourceFileNameButton, c, 2, 0,
-				1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
-				GridBagConstraints.CENTER);
-
-		return p;
+//		JPanel p = new JPanel();
+//		GridBagLayout layout = new GridBagLayout();
+//		p.setLayout(layout);
+//		GridBagConstraints c = new GridBagConstraints();
+//
+//		GridBagLayoutManager.addComponent(p, newFileNameComboBox, c, 0, 0, 1,
+//				1, 1, 0, GridBagConstraints.HORIZONTAL,
+//				GridBagConstraints.CENTER);
+//		GridBagLayoutManager.addComponent(p, savePatternButton, c, 1, 0, 1, 1,
+//				0, 0, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
+//		GridBagLayoutManager.addComponent(p, copySourceFileNameButton, c, 2, 0,
+//				1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
+//				GridBagConstraints.CENTER);
+//
+//		return p;
 	}
 
 	private void loadPatterns() {
 		patternComboModel.removeAllElements();
-		List<String> patterns = ConfigurationHelper.getInstance()
-				.getFilePatterns();
+		List<String> patterns = ConfigurationHelper.getInstance().getFilePatterns();
 		if (null != patterns) {
 			Collections.sort(patterns);
 			for (String string : patterns) {
@@ -148,15 +166,13 @@ public class ActionPanel extends JPanel {
 
 	private void moveFile() {
 		// String fileName = newFileNameTf.getText();
-		String fileName = (String) newFileNameComboBox.getSelectedItem();
+		String fileName = (String) senderComboBox.getSelectedItem();
 
-		File newFileDest = new File(destFolderLabel.getText()
-				+ File.separatorChar + fileName);
+		File newFileDest = new File(destFolderLabel.getText() + File.separatorChar + fileName);
 
 		if (newFileDest.exists()) {
-			JOptionPane
-					.showMessageDialog(ActionPanel.this,
-							"This File already exists. Not possible to replace an existing file.");
+			JOptionPane.showMessageDialog(ActionPanel.this,
+					"This File already exists. Not possible to replace an existing file.");
 			return;
 		}
 
@@ -173,12 +189,10 @@ public class ActionPanel extends JPanel {
 				// documentViewerPanel.showFile(newFileDest.getParentFile());
 
 				FileUtils.moveFile(sourceFile, newFileDest);
-				JOptionPane.showMessageDialog(ActionPanel.this,
-						"File has been moved");
+				JOptionPane.showMessageDialog(ActionPanel.this, "File has been moved");
 			} catch (IOException e1) {
 				e1.printStackTrace();
-				JOptionPane
-						.showMessageDialog(ActionPanel.this, e1.getMessage());
+				JOptionPane.showMessageDialog(ActionPanel.this, e1.getMessage());
 			}
 		}
 	}
@@ -199,9 +213,13 @@ public class ActionPanel extends JPanel {
 
 	public void sourceFileChanged(File file) {
 		sourceFile = file;
-		if (newFileNameComboBox.getSelectedItem() == null) {
-			patternComboModel.setSelectedItem(sourceFile.getName());
-		}
+//		if (senderComboBox.getSelectedItem() == null) {
+//			patternComboModel.setSelectedItem(sourceFile.getName());
+//		}
+		
+		MyParser parser = new MyParser();
+		parser.evaluate(sourceFile.getName());
+		
 	}
 
 }
