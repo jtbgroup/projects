@@ -44,5 +44,16 @@ public class MyParserTest {
 		parser.evaluate("SENDER_example.pdf");
 		assertNull(parser.getDtg());
 	}
+	
+	@Test
+	public void testGetSender() {
+		MyParser parser = new MyParser();
+		parser.evaluate("2018_SENDER_example.pdf");
+		assertEquals("SENDER", parser.getSender());
+		parser.evaluate("20180101_SENDER.pdf");
+		assertEquals("SENDER", parser.getDtg());
+		parser.evaluate("20180101_This is not a sender.pdf");
+		assertNull(parser.getSender());
+	}
 
 }

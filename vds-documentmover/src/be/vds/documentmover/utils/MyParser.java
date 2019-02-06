@@ -1,5 +1,8 @@
 package be.vds.documentmover.utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class MyParser {
 
 	private String fileName;
@@ -14,6 +17,13 @@ public class MyParser {
 
 		int idxDot = this.fileName.lastIndexOf(".");
 		this.extension = (idxDot == -1) ? null : this.fileName.substring(idxDot + 1);
+		
+		
+		String rawFileName = this.fileName.substring(0, idxDot-1);
+		System.out.println(rawFileName);
+		Pattern pattern = Pattern.compile(rawFileName);
+		Matcher matcher = pattern.matcher("(\\d{4,8})?((_)?([a-zA-Z0-9]*)?)((_)?(.*))");
+		System.out.println(matcher.matches());
 		
 //		String[] parts = this.fileName.split("_");
 //		if (parts.length > 3) {
