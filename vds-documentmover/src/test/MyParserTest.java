@@ -51,9 +51,22 @@ public class MyParserTest {
 		parser.evaluate("2018_SENDER_example.pdf");
 		assertEquals("SENDER", parser.getSender());
 		parser.evaluate("20180101_SENDER.pdf");
-		assertEquals("SENDER", parser.getDtg());
+		assertEquals("SENDER", parser.getSender());
 		parser.evaluate("20180101_This is not a sender.pdf");
 		assertNull(parser.getSender());
+	}
+	
+	@Test
+	public void testGetDescription() {
+		MyParser parser = new MyParser();
+		parser.evaluate("2018_SENDER_example.pdf");
+		assertEquals("example", parser.getDescription());
+		parser.evaluate("2018_SENDER_example-abc.pdf");
+		assertEquals("example-abc", parser.getDescription());
+		parser.evaluate("2018_SENDER_example bis.pdf");
+		assertEquals("example bis", parser.getDescription());
+		parser.evaluate("2018_SENDER.pdf");
+		assertNull(parser.getDescription());
 	}
 
 }
