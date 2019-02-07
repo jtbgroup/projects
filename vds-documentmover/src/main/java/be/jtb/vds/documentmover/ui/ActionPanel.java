@@ -31,11 +31,13 @@ public class ActionPanel extends JPanel {
 	private JTextField destFolderLabel;
 	private DefaultComboBoxModel patternComboModel;
 	private JComboBox senderComboBox;
+	private JTextField senderTextField;
 	private File sourceFile;
 	private JButton savePatternButton;
 	private JButton copySourceFileNameButton;
 	private JTextField dtgTextField;
 	private JTextField newFileNameTextField;
+	private JTextField extensionTextField;
 
 	public ActionPanel() {
 		initializeComponents();
@@ -60,11 +62,15 @@ public class ActionPanel extends JPanel {
 				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, new JLabel("_"), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.CENTER);
-		GridBagLayoutManager.addComponent(this, senderComboBox, c, i++, 1, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
+		GridBagLayoutManager.addComponent(this, senderTextField, c, i++, 1, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
 				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, new JLabel("_"), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, newFileNameTextField, c, i++, 1, 1, 1, 1, 0,
+				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, new JLabel("."), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
+				GridBagConstraints.CENTER);
+		GridBagLayoutManager.addComponent(this, extensionTextField, c, i++, 1, 1, 1, 1, 0,
 				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, savePatternButton, c, i++, 1, 1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
 				GridBagConstraints.CENTER);
@@ -90,10 +96,13 @@ public class ActionPanel extends JPanel {
 
 		newFileNameTextField = new JTextField();
 
-		patternComboModel = new DefaultComboBoxModel();
-		loadPatterns();
-		senderComboBox = new JComboBox(patternComboModel);
-		senderComboBox.setEditable(true);
+//		patternComboModel = new DefaultComboBoxModel();
+//		loadPatterns();
+//		senderComboBox = new JComboBox(patternComboModel);
+//		senderComboBox.setEditable(true);
+		
+		senderTextField = new JTextField();
+		extensionTextField = new JTextField();
 
 		savePatternButton = new JButton(new AbstractAction("Save pattern") {
 
@@ -219,7 +228,10 @@ public class ActionPanel extends JPanel {
 		
 		MyParser parser = new MyParser();
 		parser.evaluate(sourceFile.getName());
-		
+		dtgTextField.setText(parser.getDtg());
+		senderTextField.setText(parser.getSender());
+		newFileNameTextField.setText(parser.getDescription());
+		extensionTextField.setText(parser.getExtension());
 	}
 
 }

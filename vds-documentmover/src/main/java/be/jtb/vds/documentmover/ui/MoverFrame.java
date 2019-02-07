@@ -129,6 +129,8 @@ public class MoverFrame extends JFrame {
 
 		destinationExplorer.setSelectedFolder(ConfigurationHelper.getInstance()
 				.getDestinationFolder());
+		System.out.println(ConfigurationHelper.getInstance()
+				.getSourceFolder());
 		sourceExplorer.setSelectedFolder(ConfigurationHelper.getInstance()
 				.getSourceFolder());
 
