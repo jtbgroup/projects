@@ -29,14 +29,14 @@ import be.jtb.vds.documentmover.utils.MyParser;
 public class ActionPanel extends JPanel {
 	private static final Logger LOGGER = Logger.getLogger(ActionPanel.class.getName());
 	private JTextField destFolderLabel;
-	private DefaultComboBoxModel patternComboModel;
-	private JComboBox senderComboBox;
+//	private DefaultComboBoxModel patternComboModel;
+//	private JComboBox senderComboBox;
 	private JTextField senderTextField;
 	private File sourceFile;
-	private JButton savePatternButton;
+//	private JButton savePatternButton;
 	private JButton copySourceFileNameButton;
 	private JTextField dtgTextField;
-	private JTextField newFileNameTextField;
+	private JTextField descriptionTextField;
 	private JTextField extensionTextField;
 
 	public ActionPanel() {
@@ -66,14 +66,14 @@ public class ActionPanel extends JPanel {
 				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, new JLabel("_"), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.CENTER);
-		GridBagLayoutManager.addComponent(this, newFileNameTextField, c, i++, 1, 1, 1, 1, 0,
+		GridBagLayoutManager.addComponent(this, descriptionTextField, c, i++, 1, 1, 1, 1, 0,
 				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, new JLabel("."), c, i++, 1, 1, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, extensionTextField, c, i++, 1, 1, 1, 1, 0,
 				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
-		GridBagLayoutManager.addComponent(this, savePatternButton, c, i++, 1, 1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
-				GridBagConstraints.CENTER);
+//		GridBagLayoutManager.addComponent(this, savePatternButton, c, i++, 1, 1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
+//				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, copySourceFileNameButton, c, i++, 1, 1, 1, 0, 0,
 				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
 
@@ -94,7 +94,7 @@ public class ActionPanel extends JPanel {
 	private void createComponents() {
 		dtgTextField = new JTextField();
 
-		newFileNameTextField = new JTextField();
+		descriptionTextField = new JTextField();
 
 //		patternComboModel = new DefaultComboBoxModel();
 //		loadPatterns();
@@ -104,33 +104,34 @@ public class ActionPanel extends JPanel {
 		senderTextField = new JTextField();
 		extensionTextField = new JTextField();
 
-		savePatternButton = new JButton(new AbstractAction("Save pattern") {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				String newPattern = (String) senderComboBox.getSelectedItem();
-				List<String> patterns = new LinkedList<String>(ConfigurationHelper.getInstance().getFilePatterns());
-				if (null == patterns) {
-					patterns = new LinkedList<String>();
-				}
-				patterns.add(newPattern);
-				Collections.sort(patterns);
-				ConfigurationHelper.getInstance().setFilePatterns(patterns);
-				try {
-					ConfigurationHelper.getInstance().saveConfig();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				loadPatterns();
-			}
-		});
+//		savePatternButton = new JButton(new AbstractAction("Save pattern") {
+//
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				String newPattern = (String) senderComboBox.getSelectedItem();
+//				List<String> patterns = new LinkedList<String>(ConfigurationHelper.getInstance().getFilePatterns());
+//				if (null == patterns) {
+//					patterns = new LinkedList<String>();
+//				}
+//				patterns.add(newPattern);
+//				Collections.sort(patterns);
+//				ConfigurationHelper.getInstance().setFilePatterns(patterns);
+//				try {
+//					ConfigurationHelper.getInstance().saveConfig();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+////				loadPatterns();
+//			}
+//		});
 
 		copySourceFileNameButton = new JButton(new AbstractAction("Source name") {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				patternComboModel.setSelectedItem(sourceFile.getName());
+//				patternComboModel.setSelectedItem(sourceFile.getName());
+				destinationFileChanged(sourceFile);
 			}
 		});
 
@@ -151,17 +152,17 @@ public class ActionPanel extends JPanel {
 //		return p;
 	}
 
-	private void loadPatterns() {
-		patternComboModel.removeAllElements();
-		List<String> patterns = ConfigurationHelper.getInstance().getFilePatterns();
-		if (null != patterns) {
-			Collections.sort(patterns);
-			for (String string : patterns) {
-				patternComboModel.addElement(string);
-			}
-		}
-		patternComboModel.setSelectedItem(null);
-	}
+//	private void loadPatterns() {
+//		patternComboModel.removeAllElements();
+//		List<String> patterns = ConfigurationHelper.getInstance().getFilePatterns();
+//		if (null != patterns) {
+//			Collections.sort(patterns);
+//			for (String string : patterns) {
+//				patternComboModel.addElement(string);
+//			}
+//		}
+//		patternComboModel.setSelectedItem(null);
+//	}
 
 	private Component createMoveButton() {
 		JButton moveBtn = new JButton(new AbstractAction("Move") {
@@ -175,8 +176,31 @@ public class ActionPanel extends JPanel {
 
 	private void moveFile() {
 		// String fileName = newFileNameTf.getText();
-		String fileName = (String) senderComboBox.getSelectedItem();
+//		String fileName = (String) senderComboBox.getSelectedItem();
+		MyParser parser = new MyParser();
+		String dtg = dtgTextField.getText();
+		if(null != dtg && dtg.length()==0) {
+			dtg = null;
+		}
 
+		String sender = senderTextField.getText();
+		if(null != sender && sender.length()==0) {
+			sender = null;
+		}
+		
+		String description = descriptionTextField.getText();
+		if(null != description && description.length()==0) {
+			description = null;
+		}
+		
+		String extension = extensionTextField.getText();
+		if(null != extension && extension.length()==0) {
+			extension = null;
+		}
+		parser.load(dtg, sender, description, extension);
+		String fileName = parser.getFileName();
+		
+		
 		File newFileDest = new File(destFolderLabel.getText() + File.separatorChar + fileName);
 
 		if (newFileDest.exists()) {
@@ -216,7 +240,7 @@ public class ActionPanel extends JPanel {
 		destFolderLabel.setText(parentPath);
 
 		if (!file.isDirectory()) {
-			patternComboModel.setSelectedItem(file.getName());
+			LoadDestinationFileParts(file.getName());
 		}
 	}
 
@@ -225,12 +249,15 @@ public class ActionPanel extends JPanel {
 //		if (senderComboBox.getSelectedItem() == null) {
 //			patternComboModel.setSelectedItem(sourceFile.getName());
 //		}
-		
+		LoadDestinationFileParts(sourceFile.getName());
+	}
+
+	private void LoadDestinationFileParts(String fileName) {
 		MyParser parser = new MyParser();
-		parser.evaluate(sourceFile.getName());
+		parser.evaluate(fileName);
 		dtgTextField.setText(parser.getDtg());
 		senderTextField.setText(parser.getSender());
-		newFileNameTextField.setText(parser.getDescription());
+		descriptionTextField.setText(parser.getDescription());
 		extensionTextField.setText(parser.getExtension());
 	}
 

@@ -1,17 +1,15 @@
 package be.jtb.vds.documentmover.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComponent;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -22,7 +20,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import be.jtb.vds.documentmover.ApplicationManager;
 import be.jtb.vds.documentmover.ConfigurationHelper;
-import bibliothek.gui.dock.common.action.CAction;
 
 public class MoverFrame extends JFrame {
 	private ApplicationManager applicationManager;
@@ -39,7 +36,7 @@ public class MoverFrame extends JFrame {
 		this.applicationManager = applicationManager;
 		intializeFrame();
 	}
-
+	
 	private void intializeFrame() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setJMenuBar(createMenuBar());
@@ -57,8 +54,7 @@ public class MoverFrame extends JFrame {
 		initializeSourceExplorer();
 		initializeDestinationExplorer();
 		initializeActionPanel();
-		DockingLayoutManager dockingLayoutManager = new DockingLayoutManager(
-				this);
+		DockingLayoutManager dockingLayoutManager = new DockingLayoutManager(this);
 	}
 
 	private void initializeActionPanel() {
@@ -74,8 +70,7 @@ public class MoverFrame extends JFrame {
 		sourceExplorer.addTreeSelectionListener(new TreeSelectionListener() {
 
 			public void valueChanged(TreeSelectionEvent tse) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse
-						.getPath().getLastPathComponent();
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
 				sourceFileChanged((File) node.getUserObject());
 
 			}
@@ -83,26 +78,20 @@ public class MoverFrame extends JFrame {
 		sourceExplorer.setMinimumSize(new Dimension(200, 200));
 
 		sourceExplorerPanel = new JPanel(new BorderLayout());
-		sourceExplorerPanel.add(new JLabel("Source"), BorderLayout.NORTH);
 		sourceExplorerPanel.add(sourceExplorer, BorderLayout.CENTER);
 	}
 
 	private void initializeDestinationExplorer() {
 		destinationExplorer = new FileExplorerPanel(true);
-		destinationExplorer
-				.addTreeSelectionListener(new TreeSelectionListener() {
+		destinationExplorer.addTreeSelectionListener(new TreeSelectionListener() {
 
-					public void valueChanged(TreeSelectionEvent tse) {
-						DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse
-								.getPath().getLastPathComponent();
-						// destinationNode = node;
-						destinationFileChanged((File) node.getUserObject());
-					}
-				});
-
+			public void valueChanged(TreeSelectionEvent tse) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
+				// destinationNode = node;
+				destinationFileChanged((File) node.getUserObject());
+			}
+		});
 		destinationExplorerPanel = new JPanel(new BorderLayout());
-		destinationExplorerPanel.add(new JLabel("Destination"),
-				BorderLayout.NORTH);
 		destinationExplorerPanel.add(destinationExplorer, BorderLayout.CENTER);
 	}
 
@@ -127,12 +116,8 @@ public class MoverFrame extends JFrame {
 		// moverPanel.setSourceFolder(ConfigurationHelper.getInstance()
 		// .getSourceFolder());
 
-		destinationExplorer.setSelectedFolder(ConfigurationHelper.getInstance()
-				.getDestinationFolder());
-		System.out.println(ConfigurationHelper.getInstance()
-				.getSourceFolder());
-		sourceExplorer.setSelectedFolder(ConfigurationHelper.getInstance()
-				.getSourceFolder());
+		destinationExplorer.setSelectedFolder(ConfigurationHelper.getInstance().getDestinationFolder());
+		sourceExplorer.setSelectedFolder(ConfigurationHelper.getInstance().getSourceFolder());
 
 	}
 

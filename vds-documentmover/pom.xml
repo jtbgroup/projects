@@ -35,7 +35,7 @@
 			<artifactId>icepdf-core</artifactId>
 			<version>6.2.2</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.icepdf.os</groupId>
 			<artifactId>icepdf-viewer</artifactId>
@@ -66,17 +66,26 @@
 			<version>2.0</version>
 		</dependency>
 
-	   <!-- junit 5, unit test -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.3.1</version>
-            <scope>test</scope>
-        </dependency>
+		<!-- junit 5, unit test -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.3.1</version>
+			<scope>test</scope>
+		</dependency>
+
+
+<!-- for test pursposes -->
+		<dependency>
+			<groupId>com.miglayout</groupId>
+			<artifactId>miglayout</artifactId>
+			<version>3.7.4</version>
+		</dependency>
 	</dependencies>
 
+
 	<build>
-<!-- 		<sourceDirectory>src</sourceDirectory> -->
+		<!-- <sourceDirectory>src</sourceDirectory> -->
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -86,14 +95,14 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			
-			
-			  <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.0</version>
-            </plugin>
-			
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.0</version>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>

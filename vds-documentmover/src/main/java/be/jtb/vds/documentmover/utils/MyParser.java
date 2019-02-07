@@ -64,9 +64,9 @@ public class MyParser {
 	private void clear() {
 		fileName = null;
 		extension = null;
-		dtg=null;
-		sender=null;
-		description=null;
+		dtg = null;
+		sender = null;
+		description = null;
 	}
 
 	public String getFileName() {
@@ -87,5 +87,28 @@ public class MyParser {
 
 	public String getDescription() {
 		return description;
+	}
+
+	public void load(String dtg, String sender, String description, String extension) {
+		clear();
+		this.dtg = dtg;
+		this.sender = sender;
+		this.description = description;
+		this.extension = extension;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.dtg==null?"":this.dtg);
+		if(this.dtg != null && (null != this.sender || null != description)) {
+			sb.append("_");
+		}
+		sb.append(this.sender==null?"":this.sender);
+		if(this.sender != null && null != description) {
+			sb.append("_");
+		}
+		sb.append(description==null?"":this.description);
+		if(null != extension) {
+			sb.append(".").append(extension);
+		}
+		this.fileName = sb.toString();
 	}
 }

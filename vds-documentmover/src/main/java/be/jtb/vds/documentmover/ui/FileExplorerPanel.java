@@ -2,7 +2,8 @@ package be.jtb.vds.documentmover.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -14,8 +15,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -28,9 +30,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import org.apache.log4j.Logger;
+
 public class FileExplorerPanel extends JPanel {
-	private static final Logger LOGGER = Logger
-			.getLogger(FileExplorerPanel.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(FileExplorerPanel.class.getName());
 	private DefaultTreeModel treeModel;
 	private JTree tree;
 	private FileSystemView fileSystemView;
@@ -44,7 +47,21 @@ public class FileExplorerPanel extends JPanel {
 
 	private void initializeComponent() {
 		this.setLayout(new BorderLayout());
+		this.add(createButtons(), BorderLayout.NORTH);
 		this.add(createTree(), BorderLayout.CENTER);
+	}
+
+	private Component createButtons() {
+		JPanel p = new JPanel();
+		p.setLayout(new FlowLayout(FlowLayout.LEFT));
+		p.add(new JButton(new AbstractAction("Refresh") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				refreshSelection();
+			}
+		}));
+		return p;
 	}
 
 	private Component createTree() {
@@ -56,8 +73,7 @@ public class FileExplorerPanel extends JPanel {
 		// show the file system roots.
 		File[] roots = fileSystemView.getRoots();
 		for (File fileSystemRoot : roots) {
-			DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-					fileSystemRoot);
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
 			root.add(node);
 			File[] files = fileSystemView.getFiles(fileSystemRoot, true);
 
@@ -74,7 +90,7 @@ public class FileExplorerPanel extends JPanel {
 		tree.addTreeSelectionListener(createTreeSelectionListener());
 		tree.addKeyListener(createRefreshKeyListener());
 		tree.addKeyListener(createDeleteKeyListener());
-		tree.setCellRenderer(new FileTreeCellRenderer());
+		tree.setCellRenderer(new FileExplorerTreeCellRenderer());
 		tree.expandRow(0);
 		JScrollPane treeScroll = new JScrollPane(tree);
 
@@ -88,19 +104,20 @@ public class FileExplorerPanel extends JPanel {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-							.getSelectionPath().getLastPathComponent();
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath()
+							.getLastPathComponent();
 
 					if (node.isLeaf()) {
 						File f = ((File) node.getUserObject());
-						int i = JOptionPane.showConfirmDialog(
-								null,
-								"Are you sure you want to delete file\r\n"
-										+ f.getAbsolutePath(),
-								"Confirm delete", JOptionPane.WARNING_MESSAGE);
+						int i = JOptionPane.showConfirmDialog(null,
+								"Are you sure you want to delete file\r\n" + f.getAbsolutePath(), "Confirm delete",
+								JOptionPane.WARNING_MESSAGE);
 						if (i == JOptionPane.YES_OPTION) {
 							try {
+								DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) node.getParent();
 								Files.delete(f.toPath());
+								tree.setSelectionPath(new TreePath(parentNode.getPath()));
+								refreshSelection();
 							} catch (IOException e1) {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
@@ -108,9 +125,7 @@ public class FileExplorerPanel extends JPanel {
 						}
 					}
 
-					LOGGER.finest("file "
-							+ ((File) node.getUserObject()).getAbsolutePath()
-							+ " refreshed");
+					LOGGER.debug("file " + ((File) node.getUserObject()).getAbsolutePath() + " refreshed");
 				}
 			}
 		};
@@ -121,25 +136,75 @@ public class FileExplorerPanel extends JPanel {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_F5) {
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-							.getSelectionPath().getLastPathComponent();
-					boolean isExpanded = tree.isExpanded(new TreePath(node));
-					node.removeAllChildren();
-					showChildren(node);
-					treeModel.nodeStructureChanged(node);
-					if (isExpanded) {
-						tree.expandPath(new TreePath(node.getPath()));
-					}
-
-					// tree.invalidate();
-					// tree.repaint();
-					// tree.validate();
-					LOGGER.finest("file "
-							+ ((File) node.getUserObject()).getAbsolutePath()
-							+ " refreshed");
+//					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
+//							.getSelectionPath().getLastPathComponent();
+//					boolean isExpanded = tree.isExpanded(new TreePath(node));
+//					node.removeAllChildren();
+//					showChildren(node);
+//					treeModel.nodeStructureChanged(node);
+//					if (isExpanded) {
+//						tree.expandPath(new TreePath(node.getPath()));
+//					}
+//
+//					// tree.invalidate();
+//					// tree.repaint();
+//					// tree.validate();
+//					LOGGER.debug("file "
+//							+ ((File) node.getUserObject()).getAbsolutePath()
+//							+ " refreshed");
+					refreshSelection();
 				}
 			}
 		};
+	}
+
+	/**
+	 * Refreshes the selection or the parent
+	 */
+	public void refreshSelection() {
+		if (tree.isSelectionEmpty()) {
+			LOGGER.debug("Nothing to refresh");
+			return;
+		}
+
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
+		if (node.isLeaf()) {
+			node = (DefaultMutableTreeNode) node.getParent();
+		}
+		boolean isExpanded = tree.isExpanded(new TreePath(node.getPath()));
+
+		node.removeAllChildren();
+		treeModel.reload(node);
+
+		jTreeValueChanged();
+
+		if (isExpanded) {
+			tree.expandPath(new TreePath(node.getPath()));
+		}
+
+		LOGGER.debug("Refreshed node " + node.getUserObject().toString());
+	}
+
+	private void jTreeValueChanged() {
+		if (tree.isSelectionEmpty()) {
+			return;
+		}
+
+		File file = getSelectedFile();
+
+		if (!file.isFile()) {
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
+
+			if (node.getChildCount() == 0) {
+				addAllChildNodes(node, file);
+			}
+		}
+	}
+
+	private void addAllChildNodes(DefaultMutableTreeNode parentNode, File parentfile) {
+		for (File file : parentfile.listFiles()) {
+			parentNode.add(new DefaultMutableTreeNode(file));
+		}
 	}
 
 	private List<File> sortedFiles(File[] files) {
@@ -155,8 +220,7 @@ public class FileExplorerPanel extends JPanel {
 	private TreeSelectionListener createTreeSelectionListener() {
 		TreeSelectionListener treeSelectionListener = new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent tse) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse
-						.getPath().getLastPathComponent();
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
 				showChildren(node);
 				// setFileDetails((File)node.getUserObject());
 			}
@@ -166,8 +230,8 @@ public class FileExplorerPanel extends JPanel {
 	}
 
 	/**
-	 * Add the files that are contained within the directory of this node.
-	 * Thanks to Hovercraft Full Of Eels for the SwingWorker fix.
+	 * Add the files that are contained within the directory of this node. Thanks to
+	 * Hovercraft Full Of Eels for the SwingWorker fix.
 	 */
 	private void showChildren(final DefaultMutableTreeNode node) {
 		tree.setEnabled(false);
@@ -211,8 +275,7 @@ public class FileExplorerPanel extends JPanel {
 		worker.execute();
 	}
 
-	public void addTreeSelectionListener(
-			TreeSelectionListener treeSelectionListener) {
+	public void addTreeSelectionListener(TreeSelectionListener treeSelectionListener) {
 		tree.addTreeSelectionListener(treeSelectionListener);
 	}
 
@@ -220,8 +283,7 @@ public class FileExplorerPanel extends JPanel {
 		if (tree.getSelectionPath() == null) {
 			return null;
 		}
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-				.getSelectionPath().getLastPathComponent();
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
 		if (null == node) {
 			return null;
 		}
@@ -233,7 +295,7 @@ public class FileExplorerPanel extends JPanel {
 		if (null == folder) {
 			return;
 		}
-		LOGGER.finest("selecting folder " + folder);
+		LOGGER.debug("selecting folder " + folder);
 		File f = new File(folder);
 		List<File> l = new ArrayList<File>();
 		l.add(f);
@@ -247,12 +309,10 @@ public class FileExplorerPanel extends JPanel {
 
 		DefaultMutableTreeNode parentNode = root;
 		for (File file : l) {
-			LOGGER.finest("open " + file);
+			LOGGER.debug("open " + file);
 			for (int i = 0; i < parentNode.getChildCount(); i++) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) parentNode
-						.getChildAt(i);
-				if (((File) node.getUserObject()).getAbsoluteFile().equals(
-						file.getAbsoluteFile())) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) parentNode.getChildAt(i);
+				if (((File) node.getUserObject()).getAbsoluteFile().equals(file.getAbsoluteFile())) {
 					buildNode(node);
 					TreePath path = new TreePath(node.getPath());
 					tree.expandPath(path);
