@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
-import be.jtb.vds.documentmover.ConfigurationHelper;
+import be.jtb.vds.documentmover.utils.ConfigurationHelper;
 
 public class FavoriteDialog extends JDialog {
 	private static final Logger LOGGER = Logger.getLogger(FavoriteDialog.class);

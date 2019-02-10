@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import be.jtb.vds.documentmover.ui.EventManager;
 import be.jtb.vds.documentmover.ui.EventProducer;
 import be.jtb.vds.documentmover.ui.MoverFrame;
+import be.jtb.vds.documentmover.utils.ConfigurationHelper;
 import be.jtb.vds.documentmover.utils.MessageHelper;
 
 public class Launcher implements ApplicationManager {
@@ -59,6 +60,8 @@ public class Launcher implements ApplicationManager {
 				return "launcher";
 			}
 		};
+
+		EventManager.getInstance().notifyPreferencesChanged(producer);
 		EventManager.getInstance().notifySourceFileSelected(producer,
 				new File(ConfigurationHelper.getInstance().getSourceFolder()));
 		EventManager.getInstance().notifyDestinationFileSelected(producer,

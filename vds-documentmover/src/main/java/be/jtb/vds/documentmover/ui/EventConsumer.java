@@ -4,5 +4,6 @@ public interface EventConsumer {
 	
 	public String getIdentifier();
 	void notify(FileEvent fileEvent);
+	public void notifyPreferencesChanged();
 
 }

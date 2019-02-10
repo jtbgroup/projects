@@ -8,16 +8,17 @@ public class DestinationFileExplorerView extends AbstractFileExplorerView {
 
 	@Override
 	public void notifySelectionChanged() {
-		EventManager.getInstance().notifyDestinationFileSelected(this, getSelectedFile());
+		if (null != getSelectedFile()) {
+			EventManager.getInstance().notifyDestinationFileSelected(this, getSelectedFile());
+		}
 	}
 
-	
 	@Override
 	public void notifyCustom(FileEvent fileEvent) {
 		int type = fileEvent.getFileEventType();
-		if(type == FileEvent.DESTINATIONFILE_SELECTED) {
+		if (type == FileEvent.DESTINATIONFILE_SELECTED) {
 			setSelectedFolder(fileEvent.getDestinationFile());
 		}
 	}
-	
+
 }

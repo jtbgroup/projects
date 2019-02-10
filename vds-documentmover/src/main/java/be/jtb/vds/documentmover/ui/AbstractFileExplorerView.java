@@ -3,47 +3,36 @@ package be.jtb.vds.documentmover.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.SwingWorker;
-import javax.swing.border.Border;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 
-import be.jtb.vds.documentmover.ConfigurationHelper;
+import be.jtb.vds.documentmover.utils.ConfigurationHelper;
 import be.jtb.vds.documentmover.utils.ResourceManager;
 
 public abstract class AbstractFileExplorerView extends View implements FileExplorerListener {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractFileExplorerView.class);
 	private FileExplorer fileExplorer;
+	private JComboBox favoritesComboBox;
+	private DefaultComboBoxModel<Favorite> favoritesComboBoxModel;
+	private boolean selectionNotificationBlocked;
 
 	public AbstractFileExplorerView(String identifier, String name, boolean filesVisible) {
 		super(identifier, name);
@@ -61,7 +50,7 @@ public abstract class AbstractFileExplorerView extends View implements FileExplo
 		JPanel p = new JPanel();
 		p.setLayout(new FlowLayout(FlowLayout.LEFT));
 		p.add(new JButton(
-				new AbstractAction("Refresh", ResourceManager.getInstance().getImageIcon("refresh_16x16.png")) {
+				new AbstractAction(null, ResourceManager.getInstance().getImageIcon("refresh_16x16.png")) {
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -69,7 +58,7 @@ public abstract class AbstractFileExplorerView extends View implements FileExplo
 					}
 				}));
 
-		p.add(new JButton(new AbstractAction("*") {
+		p.add(new JButton(new AbstractAction(null, ResourceManager.getInstance().getImageIcon("favorite_16x16.png") ) {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -82,9 +71,22 @@ public abstract class AbstractFileExplorerView extends View implements FileExplo
 				int i = dlg.showDialog(f.getName(), f.getAbsolutePath());
 				if (i == FavoriteDialog.SAVE) {
 
-					ConfigurationHelper.getInstance().addFavorite(dlg.getFavoriteName(), dlg.getFavoriteFolder());
+					ConfigurationHelper.getInstance()
+							.addFavorite(new Favorite(dlg.getFavoriteName(), dlg.getFavoriteFolder()));
 					try {
 						ConfigurationHelper.getInstance().saveConfig();
+						EventManager.getInstance().notifyPreferencesChanged(new EventProducer() {
+
+							@Override
+							public String getName() {
+								return "favorites";
+							}
+
+							@Override
+							public String getIdentifier() {
+								return "dialog.favorite";
+							}
+						});
 					} catch (IOException e1) {
 						LOGGER.error(e1.getMessage());
 					}
@@ -92,12 +94,15 @@ public abstract class AbstractFileExplorerView extends View implements FileExplo
 			}
 		}));
 
-		JComboBox favoritesComboBox = new JComboBox();
+		favoritesComboBoxModel = new DefaultComboBoxModel<Favorite>();
+		favoritesComboBox = new JComboBox(favoritesComboBoxModel);
 		favoritesComboBox.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				fileExplorer.setSelectedFolder(new File((String) e.getItem()));
+				if (!selectionNotificationBlocked) {
+					fileExplorer.setSelectedFolder(new File(((Favorite) e.getItem()).getPath()), true);
+				}
 			}
 		});
 		p.add(favoritesComboBox);
@@ -130,6 +135,25 @@ public abstract class AbstractFileExplorerView extends View implements FileExplo
 		fileExplorer.setSelectedFolder(folder);
 	}
 
+	protected void setFavorites(List<Favorite> favorites) {
+		Favorite selection = (Favorite) favoritesComboBox.getSelectedItem();
+
+		selectionNotificationBlocked = true;
+		favoritesComboBoxModel.removeAllElements();
+		for (Favorite favorite : favorites) {
+			favoritesComboBoxModel.addElement(favorite);
+		}
+		favoritesComboBox.repaint();
+
+		favoritesComboBox.setSelectedItem(selection);
+		selectionNotificationBlocked = false;
+	}
+
 	protected abstract void notifyCustom(FileEvent fileEvent);
+
+	@Override
+	public void notifyPreferencesChanged() {
+		setFavorites(ConfigurationHelper.getInstance().getFavorites());
+	}
 
 }

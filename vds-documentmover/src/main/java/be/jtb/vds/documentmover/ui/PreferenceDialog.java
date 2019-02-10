@@ -1,6 +1,7 @@
 package be.jtb.vds.documentmover.ui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import be.jtb.vds.documentmover.ConfigurationHelper;
+import be.jtb.vds.documentmover.utils.ConfigurationHelper;
 
 public class PreferenceDialog extends JDialog {
 
@@ -49,7 +50,7 @@ public class PreferenceDialog extends JDialog {
 		filePatternPanel.setFilePatterns(ConfigurationHelper.getInstance()
 				.getFilePatterns());
 		
-		favoritesPanel.setFavorites(ConfigurationHelper.getInstance().getFavoriteFolders());
+		favoritesPanel.setFavorites(ConfigurationHelper.getInstance().getFavorites());
 	}
 
 	private Component createContentPane() {
@@ -82,7 +83,7 @@ public class PreferenceDialog extends JDialog {
 				++row, 1, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.WEST);
 		GridBagLayoutManager.addComponent(p, createFavoritesComponent(), c,
-				1, row, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
+				1, row, 1, 1, 1, 1, GridBagConstraints.BOTH,
 				GridBagConstraints.WEST);
 
 		GridBagLayoutManager.addComponent(p, Box.createGlue(), c, 0, ++row, 2,
@@ -96,6 +97,7 @@ public class PreferenceDialog extends JDialog {
 
 	private Component createFavoritesComponent() {
 		favoritesPanel = new FavoritesPanel();
+		favoritesPanel.setPreferredSize(new Dimension(300, 300));
 		return favoritesPanel;
 	}
 	
@@ -147,10 +149,22 @@ public class PreferenceDialog extends JDialog {
 		saveFavorites();
 
 		ConfigurationHelper.getInstance().saveConfig();
+		EventManager.getInstance().notifyPreferencesChanged(new EventProducer() {
+			
+			@Override
+			public String getName() {
+				return "Preference Dialog";
+			}
+			
+			@Override
+			public String getIdentifier() {
+				return "dialog.preference";
+			}
+		});
 	}
 
 	private void saveFavorites() {
-		ConfigurationHelper.getInstance().setFavoriteFolders(
+		ConfigurationHelper.getInstance().setFavorites(
 				favoritesPanel.getFavorites());
 	}
 

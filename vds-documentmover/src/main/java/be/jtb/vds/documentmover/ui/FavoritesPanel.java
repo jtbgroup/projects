@@ -3,6 +3,7 @@ package be.jtb.vds.documentmover.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,14 +34,13 @@ public class FavoritesPanel extends JPanel {
 
 	public void initializeComponent() {
 		this.setLayout(new BorderLayout());
-		this.add(createList(), BorderLayout.CENTER);
+		this.add(createTable(), BorderLayout.CENTER);
 		this.add(createButtonsPanel(), BorderLayout.EAST);
 	}
 
-	private Component createList() {
+	private Component createTable() {
 		favoritesTableModel = new DefaultTableModel();
-		favoritesTableModel.addRow(new String[] {"a", "a"});
-
+		favoritesTableModel.setColumnIdentifiers(new String[] { "Name", "Path" });
 		favoritesTable = new JTable(favoritesTableModel);
 		favoritesTable.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
 		favoritesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -55,13 +55,14 @@ public class FavoritesPanel extends JPanel {
 		return scroll;
 	}
 
-	public void setFavorites(Map<String, String> favorites) {
-		favoritesTable.removeAll();
-		for (String key : favorites.keySet()) {
-			favoritesTableModel.addRow(new String[] { key, favorites.get(key) });
+	public void setFavorites(List<Favorite> favorites) {
+//		favoritesTable.removeAll();
+//		favoritesTableModel.ad
+		for (Favorite favorite : favorites) {
+			favoritesTableModel.addRow(new String[] { favorite.getName(), favorite.getPath() });
 		}
 		favoritesTable.setModel(favoritesTableModel);
-		favoritesTable.repaint();
+//		favoritesTable.repaint();
 	}
 
 	private Component createButtonsPanel() {
@@ -95,15 +96,14 @@ public class FavoritesPanel extends JPanel {
 		return p;
 	}
 
-	public Map<String, String> getFavorites() {
-		Vector data = favoritesTableModel.getDataVector();
-		Map<String, String> map = new HashMap<String, String>();
-		for (Iterator iterator = data.iterator(); iterator.hasNext();) {
-			Object object = (Object) iterator.next();
-			map.put(object.toString(), object.toString());
+	public List<Favorite> getFavorites() {
+		List<Favorite> favorites = new ArrayList<Favorite>();
+		int rows = favoritesTableModel.getRowCount();
+		for (int i = 0; i < rows; i++) {
+			favorites.add(new Favorite((String) favoritesTableModel.getValueAt(i, 0), (String) favoritesTableModel.getValueAt(i, 1)));
 		}
-		
-		return map;
+
+		return favorites;
 	}
 
 }

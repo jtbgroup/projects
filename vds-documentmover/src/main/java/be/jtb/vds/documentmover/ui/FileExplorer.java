@@ -253,7 +253,11 @@ public class FileExplorer extends JPanel {
 		return (File) node.getUserObject();
 	}
 
-	protected void setSelectedFolder(File folder) {
+	public void setSelectedFolder(File file) {
+		setSelectedFolder(file, false);
+	}
+
+	protected void setSelectedFolder(File folder, boolean expandFolder) {
 		if (null == folder) {
 			return;
 		}
@@ -279,6 +283,11 @@ public class FileExplorer extends JPanel {
 					tree.expandPath(path);
 					tree.setSelectionPath(path);
 					tree.scrollPathToVisible(path);
+					
+					if(expandFolder) {
+						showChildren(node);
+					}
+					
 					tree.invalidate();
 					tree.repaint();
 					tree.validate();

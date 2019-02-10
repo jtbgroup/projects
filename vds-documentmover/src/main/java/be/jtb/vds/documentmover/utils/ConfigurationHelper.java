@@ -1,4 +1,4 @@
-package be.jtb.vds.documentmover;
+package be.jtb.vds.documentmover.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+
+import be.jtb.vds.documentmover.ui.Favorite;
 
 public class ConfigurationHelper {
 
@@ -64,7 +66,6 @@ public class ConfigurationHelper {
 		if (cf.exists()) {
 			properties.load(new FileInputStream(cf));
 		}
-
 	}
 
 	public void setFilePatterns(List<String> filePatterns) {
@@ -84,36 +85,37 @@ public class ConfigurationHelper {
 		return Arrays.asList(patterns);
 	}
 
-	public Map<String, String> getFavoriteFolders() {
+	public List<Favorite> getFavorites() {
 		String props = properties.getProperty("folders.favorites");
 		if (null == props) {
-			return new HashMap<String, String>();
+			return new ArrayList<Favorite>();
 		}
 
-		Map<String, String> map = new HashMap<String, String>();
+		List<Favorite> favorites = new ArrayList<Favorite>();
 		String[] entries = props.split(";");
 		for (String entry : entries) {
 			String[] split = entry.split(">");
-			map.put(split[0], split[1]);
+			favorites.add(new Favorite(split[0], split[1]));
 		}
-		return map;
+		Collections.sort(favorites);
+		return favorites;
 	}
 
-	public void setFavoriteFolders(Map<String, String> folderFavorites) {
+	public void setFavorites(List<Favorite> favorites) {
 		StringBuilder sb = new StringBuilder();
-		int count = folderFavorites.entrySet().size() - 1;
-		for (Entry<String, String> entry : folderFavorites.entrySet()) {
-			sb.append(entry.getKey() + ">" + entry.getValue());
-			if (count > 0) {
+		int count = favorites.size() - 1;
+		for (Favorite favorite: favorites) {
+			sb.append(favorite.getName() + ">" + favorite.getPath());
+			if (count-- > 0) {
 				sb.append(";");
 			}
 		}
 		properties.put("folders.favorites", sb.toString());
 	}
 
-	public void addFavorite(String name, String folder) {
-		Map<String, String> favs = getFavoriteFolders();
-		favs.put(name, folder);
-		setFavoriteFolders(favs);
+	public void addFavorite(Favorite favorite) {
+		List<Favorite> favs = getFavorites();
+		favs.add(favorite);
+		setFavorites(favs);
 	}
 }

@@ -68,7 +68,7 @@ public class ActionView extends View {
 		GridBagLayoutManager.addComponent(this, copySourceFileNameButton, c, i++, 1, 1, 1, 0, 0,
 				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
 
-		GridBagLayoutManager.addComponent(this, createMoveButton(), c, 0, 2, 7, 1, 0, 0, GridBagConstraints.NONE,
+		GridBagLayoutManager.addComponent(this, createMoveButton(), c, 0, 2, 9, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.CENTER);
 
 		GridBagLayoutManager.addComponent(this, Box.createVerticalGlue(), c, 0, 3, 7, 1, 1, 1, GridBagConstraints.BOTH,
@@ -116,7 +116,8 @@ public class ActionView extends View {
 		File newFileDest = new File(destFolderLabel.getText() + File.separatorChar + fileName);
 
 		if (newFileDest.exists()) {
-			MessageHelper.getInstance().displayMessage("This File already exists.\r\nNot possible to replace an existing file.");
+			MessageHelper.getInstance()
+					.displayMessage("This File already exists.\r\nNot possible to replace an existing file.");
 			return;
 		}
 
@@ -127,14 +128,14 @@ public class ActionView extends View {
 		LOGGER.debug(sb.toString());
 		sb.append("\r\n\tPlease Confirm");
 		int i = MessageHelper.getInstance().displayConfirm(sb.toString());
-				
+
 		if (i == MessageHelper.YES_OPTION) {
 			try {
 				notifyFileEvent(new FileEvent(FileEvent.FILE_WILL_MOVE, sourceFile, newFileDest));
 				FileUtils.moveFile(sourceFile, newFileDest);
 				LOGGER.info("File moved : " + sourceFile + " >> " + newFileDest);
 				notifyFileEvent(new FileEvent(FileEvent.FILE_MOVED, sourceFile, newFileDest));
-				MessageHelper.getInstance().displayMessage ("File has been moved");
+				MessageHelper.getInstance().displayMessage("File has been moved");
 			} catch (IOException e1) {
 				e1.printStackTrace();
 				MessageHelper.getInstance().displayMessage(e1.getMessage());
@@ -191,8 +192,10 @@ public class ActionView extends View {
 	}
 
 	private void sourceFileChanged(File file) {
-		sourceFile = file;
-		loadDestinationFileParts(sourceFile.getName());
+		if (file.isFile()) {
+			sourceFile = file;
+			loadDestinationFileParts(sourceFile.getName());
+		}
 	}
 
 	private void loadDestinationFileParts(String fileName) {

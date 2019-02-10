@@ -26,7 +26,7 @@ public class EventManager {
 	}
 
 	public void notifySourceFileSelected(EventProducer eventProducer, File sourceFile) {
-		LOGGER.debug("New source file selected by " + eventProducer.getIdentifier() + ": " + sourceFile.getPath());
+		LOGGER.debug("New source file selected by " + eventProducer.getIdentifier() + ": " + sourceFile.getAbsolutePath());
 		notifyFileEvent(eventProducer, new FileEvent(FileEvent.SOURCEFILE_SELECTED, sourceFile, null));
 	}
 	
@@ -40,6 +40,12 @@ public class EventManager {
 			if (eventProducer.getIdentifier() != eventConsumer.getIdentifier()) {
 				eventConsumer.notify(fileEvent);
 			}
+		}
+	}
+
+	public void notifyPreferencesChanged(EventProducer producer) {
+		for (EventConsumer eventConsumer : eventConsumers) {
+				eventConsumer.notifyPreferencesChanged();
 		}
 	}
 }
