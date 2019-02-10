@@ -11,23 +11,20 @@ import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
 import be.jtb.vds.documentmover.utils.FileUtils;
+import be.jtb.vds.documentmover.utils.MessageHelper;
 import be.jtb.vds.documentmover.utils.MyParser;
 import be.jtb.vds.documentmover.utils.ResourceManager;
 
 public class ActionView extends View {
 	private static final Logger LOGGER = Logger.getLogger(ActionView.class.getName());
 	private JTextField destFolderLabel;
-//	private DefaultComboBoxModel patternComboModel;
-//	private JComboBox senderComboBox;
 	private JTextField senderTextField;
 	private File sourceFile;
-//	private JButton savePatternButton;
 	private JButton copySourceFileNameButton;
 	private JTextField dtgTextField;
 	private JTextField descriptionTextField;
@@ -68,8 +65,6 @@ public class ActionView extends View {
 				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, extensionTextField, c, i++, 1, 1, 1, 1, 0,
 				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
-//		GridBagLayoutManager.addComponent(this, savePatternButton, c, i++, 1, 1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
-//				GridBagConstraints.CENTER);
 		GridBagLayoutManager.addComponent(this, copySourceFileNameButton, c, i++, 1, 1, 1, 0, 0,
 				GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
 
@@ -92,73 +87,17 @@ public class ActionView extends View {
 
 		descriptionTextField = new JTextField();
 
-//		patternComboModel = new DefaultComboBoxModel();
-//		loadPatterns();
-//		senderComboBox = new JComboBox(patternComboModel);
-//		senderComboBox.setEditable(true);
-
 		senderTextField = new JTextField();
 		extensionTextField = new JTextField();
-
-//		savePatternButton = new JButton(new AbstractAction("Save pattern") {
-//
-//			@Override
-//			public void actionPerformed(ActionEvent arg0) {
-//				String newPattern = (String) senderComboBox.getSelectedItem();
-//				List<String> patterns = new LinkedList<String>(ConfigurationHelper.getInstance().getFilePatterns());
-//				if (null == patterns) {
-//					patterns = new LinkedList<String>();
-//				}
-//				patterns.add(newPattern);
-//				Collections.sort(patterns);
-//				ConfigurationHelper.getInstance().setFilePatterns(patterns);
-//				try {
-//					ConfigurationHelper.getInstance().saveConfig();
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-////				loadPatterns();
-//			}
-//		});
 
 		copySourceFileNameButton = new JButton(new AbstractAction("Source name") {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				patternComboModel.setSelectedItem(sourceFile.getName());
 				destinationFileChanged(sourceFile);
 			}
 		});
-
-//		JPanel p = new JPanel();
-//		GridBagLayout layout = new GridBagLayout();
-//		p.setLayout(layout);
-//		GridBagConstraints c = new GridBagConstraints();
-//
-//		GridBagLayoutManager.addComponent(p, newFileNameComboBox, c, 0, 0, 1,
-//				1, 1, 0, GridBagConstraints.HORIZONTAL,
-//				GridBagConstraints.CENTER);
-//		GridBagLayoutManager.addComponent(p, savePatternButton, c, 1, 0, 1, 1,
-//				0, 0, GridBagConstraints.HORIZONTAL, GridBagConstraints.CENTER);
-//		GridBagLayoutManager.addComponent(p, copySourceFileNameButton, c, 2, 0,
-//				1, 1, 0, 0, GridBagConstraints.HORIZONTAL,
-//				GridBagConstraints.CENTER);
-//
-//		return p;
 	}
-
-//	private void loadPatterns() {
-//		patternComboModel.removeAllElements();
-//		List<String> patterns = ConfigurationHelper.getInstance().getFilePatterns();
-//		if (null != patterns) {
-//			Collections.sort(patterns);
-//			for (String string : patterns) {
-//				patternComboModel.addElement(string);
-//			}
-//		}
-//		patternComboModel.setSelectedItem(null);
-//	}
 
 	private Component createMoveButton() {
 		JButton moveBtn = new JButton(
@@ -172,37 +111,33 @@ public class ActionView extends View {
 	}
 
 	private void moveFile() {
-		// String fileName = newFileNameTf.getText();
-//		String fileName = (String) senderComboBox.getSelectedItem();
 		String fileName = buildFileName();
 
 		File newFileDest = new File(destFolderLabel.getText() + File.separatorChar + fileName);
 
 		if (newFileDest.exists()) {
-			JOptionPane.showMessageDialog(ActionView.this,
-					"This File already exists. Not possible to replace an existing file.");
+			MessageHelper.getInstance().displayMessage("This File already exists.\r\nNot possible to replace an existing file.");
 			return;
 		}
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("Moving file ");
-		sb.append("\r\n  " + sourceFile.getAbsolutePath());
-		sb.append("\r\n    to " + newFileDest.getAbsolutePath());
+		sb.append("\r\n\t" + sourceFile.getAbsolutePath());
+		sb.append("\r\nto " + newFileDest.getAbsolutePath());
 		LOGGER.debug(sb.toString());
-		sb.append("\r\nPlease Confirm");
-		int i = JOptionPane.showConfirmDialog(ActionView.this, sb.toString());
-		if (i == JOptionPane.YES_OPTION) {
+		sb.append("\r\n\tPlease Confirm");
+		int i = MessageHelper.getInstance().displayConfirm(sb.toString());
+				
+		if (i == MessageHelper.YES_OPTION) {
 			try {
-				// documentViewerPanel.releaseFile();
-				// documentViewerPanel.showFile(newFileDest.getParentFile());
 				notifyFileEvent(new FileEvent(FileEvent.FILE_WILL_MOVE, sourceFile, newFileDest));
 				FileUtils.moveFile(sourceFile, newFileDest);
 				LOGGER.info("File moved : " + sourceFile + " >> " + newFileDest);
 				notifyFileEvent(new FileEvent(FileEvent.FILE_MOVED, sourceFile, newFileDest));
-				JOptionPane.showMessageDialog(ActionView.this, "File has been moved");
+				MessageHelper.getInstance().displayMessage ("File has been moved");
 			} catch (IOException e1) {
 				e1.printStackTrace();
-				JOptionPane.showMessageDialog(ActionView.this, e1.getMessage());
+				MessageHelper.getInstance().displayMessage(e1.getMessage());
 			}
 		}
 	}
@@ -257,9 +192,6 @@ public class ActionView extends View {
 
 	private void sourceFileChanged(File file) {
 		sourceFile = file;
-//		if (senderComboBox.getSelectedItem() == null) {
-//			patternComboModel.setSelectedItem(sourceFile.getName());
-//		}
 		loadDestinationFileParts(sourceFile.getName());
 	}
 

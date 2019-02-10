@@ -24,6 +24,7 @@ public class PreferenceDialog extends JDialog {
 	private FileSelector sourceFileSelector;
 	private FileSelector destinationFileSelector;
 	private FilePatternPanel filePatternPanel;
+	private FavoritesPanel favoritesPanel;
 
 	private PreferenceDialog() {
 		initComponent();
@@ -47,6 +48,8 @@ public class PreferenceDialog extends JDialog {
 		
 		filePatternPanel.setFilePatterns(ConfigurationHelper.getInstance()
 				.getFilePatterns());
+		
+		favoritesPanel.setFavorites(ConfigurationHelper.getInstance().getFavoriteFolders());
 	}
 
 	private Component createContentPane() {
@@ -74,6 +77,13 @@ public class PreferenceDialog extends JDialog {
 		GridBagLayoutManager.addComponent(p, createFilePatternComponent(), c,
 				1, row, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
 				GridBagConstraints.WEST);
+		
+		GridBagLayoutManager.addComponent(p, new JLabel("Favorites"), c, 0,
+				++row, 1, 1, 0, 0, GridBagConstraints.NONE,
+				GridBagConstraints.WEST);
+		GridBagLayoutManager.addComponent(p, createFavoritesComponent(), c,
+				1, row, 1, 1, 1, 0, GridBagConstraints.HORIZONTAL,
+				GridBagConstraints.WEST);
 
 		GridBagLayoutManager.addComponent(p, Box.createGlue(), c, 0, ++row, 2,
 				1, 1, 1, GridBagConstraints.BOTH, GridBagConstraints.WEST);
@@ -84,6 +94,11 @@ public class PreferenceDialog extends JDialog {
 		return p;
 	}
 
+	private Component createFavoritesComponent() {
+		favoritesPanel = new FavoritesPanel();
+		return favoritesPanel;
+	}
+	
 	private Component createFilePatternComponent() {
 		filePatternPanel = new FilePatternPanel();
 		return filePatternPanel;
@@ -129,8 +144,14 @@ public class PreferenceDialog extends JDialog {
 		saveSourceFolder();
 		saveDestinationFolder();
 		saveFilePatterns();
+		saveFavorites();
 
 		ConfigurationHelper.getInstance().saveConfig();
+	}
+
+	private void saveFavorites() {
+		ConfigurationHelper.getInstance().setFavoriteFolders(
+				favoritesPanel.getFavorites());
 	}
 
 	private void saveFilePatterns() {

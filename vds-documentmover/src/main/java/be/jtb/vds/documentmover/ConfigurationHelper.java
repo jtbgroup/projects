@@ -4,8 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 public class ConfigurationHelper {
@@ -24,9 +29,8 @@ public class ConfigurationHelper {
 		return instance;
 	}
 
-	private static final String CONFIG_FILE = System.getProperty("user.home")
-			+ File.separatorChar + ".jtb" + File.separatorChar
-			+ "documentMover" + File.separatorChar + "config.properties";
+	private static final String CONFIG_FILE = System.getProperty("user.home") + File.separatorChar + ".jtb"
+			+ File.separatorChar + "documentMover" + File.separatorChar + "config.properties";
 
 	public void saveConfig() throws IOException {
 		File cf = new File(CONFIG_FILE);
@@ -36,8 +40,7 @@ public class ConfigurationHelper {
 			cf.createNewFile();
 		}
 
-		properties.store(new FileOutputStream(cf),
-				"Config for Document Mover application provided by Jt'B");
+		properties.store(new FileOutputStream(cf), "Config for Document Mover application provided by Jt'B");
 	}
 
 	public void setSourceFolder(String sourceFolder) {
@@ -71,13 +74,46 @@ public class ConfigurationHelper {
 		}
 		properties.put("file.patterns", sb.toString());
 	}
-	
-	public List<String> getFilePatterns(){
+
+	public List<String> getFilePatterns() {
 		String props = properties.getProperty("file.patterns");
-		if(null == props){
-			return null;
+		if (null == props) {
+			return new ArrayList<String>();
 		}
 		String[] patterns = props.split(";");
 		return Arrays.asList(patterns);
+	}
+
+	public Map<String, String> getFavoriteFolders() {
+		String props = properties.getProperty("folders.favorites");
+		if (null == props) {
+			return new HashMap<String, String>();
+		}
+
+		Map<String, String> map = new HashMap<String, String>();
+		String[] entries = props.split(";");
+		for (String entry : entries) {
+			String[] split = entry.split(">");
+			map.put(split[0], split[1]);
+		}
+		return map;
+	}
+
+	public void setFavoriteFolders(Map<String, String> folderFavorites) {
+		StringBuilder sb = new StringBuilder();
+		int count = folderFavorites.entrySet().size() - 1;
+		for (Entry<String, String> entry : folderFavorites.entrySet()) {
+			sb.append(entry.getKey() + ">" + entry.getValue());
+			if (count > 0) {
+				sb.append(";");
+			}
+		}
+		properties.put("folders.favorites", sb.toString());
+	}
+
+	public void addFavorite(String name, String folder) {
+		Map<String, String> favs = getFavoriteFolders();
+		favs.put(name, folder);
+		setFavoriteFolders(favs);
 	}
 }

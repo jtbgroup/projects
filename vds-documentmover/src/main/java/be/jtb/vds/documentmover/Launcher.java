@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import be.jtb.vds.documentmover.ui.EventManager;
 import be.jtb.vds.documentmover.ui.EventProducer;
 import be.jtb.vds.documentmover.ui.MoverFrame;
+import be.jtb.vds.documentmover.utils.MessageHelper;
 
 public class Launcher implements ApplicationManager {
 	private static final Logger LOGGER = Logger.getLogger(Launcher.class);
@@ -88,6 +89,7 @@ public class Launcher implements ApplicationManager {
 				frame.setSize(1000, 600);
 				frame.setLocationRelativeTo(null);
 				intializeConfigValues();
+				MessageHelper.getInstance().setDisplayContainer(frame);
 				frame.setVisible(true);
 			}
 		});

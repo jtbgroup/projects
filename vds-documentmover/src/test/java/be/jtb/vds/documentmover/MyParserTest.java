@@ -74,6 +74,8 @@ public class MyParserTest {
 		MyParser parser = new MyParser();
 		parser.evaluate("2018_SENDER_example.pdf");
 		assertEquals("SENDER", parser.getSender());
+		parser.evaluate("2018_SENDER 2_example.pdf");
+		assertEquals("SENDER 2", parser.getSender());
 		parser.evaluate("20180101_SENDER.pdf");
 		assertEquals("SENDER", parser.getSender());
 		parser.evaluate("20180101_This is not a sender.pdf");

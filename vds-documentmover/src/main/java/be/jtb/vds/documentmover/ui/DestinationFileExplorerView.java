@@ -7,7 +7,7 @@ public class DestinationFileExplorerView extends AbstractFileExplorerView {
 	}
 
 	@Override
-	protected void notifySelectionChanged() {
+	public void notifySelectionChanged() {
 		EventManager.getInstance().notifyDestinationFileSelected(this, getSelectedFile());
 	}
 

@@ -10,10 +10,10 @@ public class MyParser {
 	private String dtg;
 	private String sender;
 	private String description;
-	private static final String PATTERN_DTG_SEN_DESC = "(\\d{4,8})_([a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*)_(.*)";
-	private static final String PATTERN_DTG_SEN = "(\\d{4,8})_([a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*)";
+	private static final String PATTERN_DTG_SEN_DESC = "(\\d{4,8})_([a-zA-Z0-9]*[a-z A-Z][a-zA-Z0-9]*)_(.*)";
+	private static final String PATTERN_DTG_SEN = "(\\d{4,8})_([a-zA-Z0-9]*[a-z A-Z][a-zA-Z0-9]*)";
 	private static final String PATTERN_DTG_DESC = "(\\d{4,8})_(.*)";
-	private static final String PATTERN_SEN_DESC = "([a-zA-Z0-9]*[a-zA-Z][a-zA-Z0-9]*)_(.*)";
+	private static final String PATTERN_SEN_DESC = "([a-zA-Z0-9]*[a-z A-Z][a-zA-Z0-9]*)_(.*)";
 
 	public void evaluate(String fileName) {
 		clear();
