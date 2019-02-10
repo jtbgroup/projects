@@ -54,33 +54,35 @@ public class DockingLayoutManager {
 //		parentFrame.setJMenuBar(menuBar);
 	}
 
-	
-
 
 	private SingleCDockable createActionDock() {
+		View producer = parentFrame.getView(MoverFrame.VIEW_ID_ACTIONS);
 		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				"Action", "Action", parentFrame.getActionPanel());
+				producer.getIdentifier(), producer.getName(), producer);
 		dockable.setCloseable(true);
 		return dockable;
 	}
 
 	private SingleCDockable createFileBrowserDestinationDock() {
+		View producer = parentFrame.getView(MoverFrame.VIEW_ID_DESTINATION);
 		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				"Destination", "Destination", parentFrame.getFileExplorerDestinationPanel());
+				producer.getIdentifier(), producer.getName(), producer);
 		dockable.setCloseable(true);
 		return dockable;
 	}
 
 	private SingleCDockable createFileBrowserSourceDock() {
+		View producer = parentFrame.getView(MoverFrame.VIEW_ID_SOURCE);
 		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				"Source", "Source", parentFrame.getFileExplorerSourcePanel());
+				producer.getIdentifier(), producer.getName(), producer);
 		dockable.setCloseable(true);
 		return dockable;
 	}
 
 	private SingleCDockable createFileViewerDock() {
+		View producer = parentFrame.getView(MoverFrame.VIEW_ID_DOCUMENTS);
 		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				"Documents", "Documents", parentFrame.getDocumentViewerPanel());
+				producer.getIdentifier(), producer.getName(), producer);
 		dockable.setCloseable(true);
 		return dockable;
 	}

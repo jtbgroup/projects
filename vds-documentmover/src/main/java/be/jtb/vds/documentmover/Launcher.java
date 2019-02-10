@@ -1,5 +1,6 @@
 package be.jtb.vds.documentmover;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.SwingUtilities;
@@ -9,6 +10,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
+import be.jtb.vds.documentmover.ui.EventManager;
+import be.jtb.vds.documentmover.ui.EventProducer;
 import be.jtb.vds.documentmover.ui.MoverFrame;
 
 public class Launcher implements ApplicationManager {
@@ -39,7 +42,26 @@ public class Launcher implements ApplicationManager {
 		initLogger();
 		loadConfiguration();
 		launchFrame();
+		
+	}
 
+	private void intializeConfigValues() {
+		EventProducer producer = new EventProducer() {
+			
+			@Override
+			public String getName() {
+				return "launcher";
+			}
+			
+			@Override
+			public String getIdentifier() {
+				return "launcher";
+			}
+		};
+		EventManager.getInstance().notifySourceFileSelected(producer,
+				new File(ConfigurationHelper.getInstance().getSourceFolder()));
+		EventManager.getInstance().notifyDestinationFileSelected(producer,
+				new File(ConfigurationHelper.getInstance().getDestinationFolder()));
 	}
 
 	private void initLogger() {
@@ -49,6 +71,7 @@ public class Launcher implements ApplicationManager {
 	private void loadConfiguration() {
 		try {
 			ConfigurationHelper.getInstance().loadConfig();
+
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage());
 		}
@@ -62,8 +85,9 @@ public class Launcher implements ApplicationManager {
 			@Override
 			public void run() {
 //				frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
-				frame.setSize(1300, 800);
+				frame.setSize(1000, 600);
 				frame.setLocationRelativeTo(null);
+				intializeConfigValues();
 				frame.setVisible(true);
 			}
 		});

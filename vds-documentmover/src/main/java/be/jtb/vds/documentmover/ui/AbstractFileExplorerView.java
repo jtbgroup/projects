@@ -3,6 +3,7 @@ package be.jtb.vds.documentmover.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -32,18 +33,40 @@ import javax.swing.tree.TreePath;
 
 import org.apache.log4j.Logger;
 
-public class FileExplorerPanel extends JPanel {
-	private static final Logger LOGGER = Logger.getLogger(FileExplorerPanel.class.getName());
+import be.jtb.vds.documentmover.utils.ResourceManager;
+
+public abstract class AbstractFileExplorerView extends View {
+	private static final Logger LOGGER = Logger.getLogger(AbstractFileExplorerView.class.getName());
 	private DefaultTreeModel treeModel;
 	private JTree tree;
 	private FileSystemView fileSystemView;
 	private boolean filesVisible;
 	private DefaultMutableTreeNode root;
+	private boolean selectionNotificationBlocked;
 
-	public FileExplorerPanel(boolean filesVisible) {
+	public AbstractFileExplorerView(String identifier, String name, boolean filesVisible) {
+		super(identifier, name);
 		this.filesVisible = filesVisible;
 		initializeComponent();
+		registerTreeSelectionListener();
+		EventManager.getInstance().registerEventListener(this);
 	}
+
+
+
+	private void registerTreeSelectionListener() {
+		tree.addTreeSelectionListener(new TreeSelectionListener() {
+
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				if (!selectionNotificationBlocked) {
+					notifySelectionChanged();
+				}
+			}
+		});
+	}
+
+	protected abstract void notifySelectionChanged();
 
 	private void initializeComponent() {
 		this.setLayout(new BorderLayout());
@@ -54,13 +77,14 @@ public class FileExplorerPanel extends JPanel {
 	private Component createButtons() {
 		JPanel p = new JPanel();
 		p.setLayout(new FlowLayout(FlowLayout.LEFT));
-		p.add(new JButton(new AbstractAction("Refresh") {
+		p.add(new JButton(
+				new AbstractAction("Refresh", ResourceManager.getInstance().getImageIcon("refresh_16x16.png")) {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				refreshSelection();
-			}
-		}));
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						refreshSelection();
+					}
+				}));
 		return p;
 	}
 
@@ -70,18 +94,21 @@ public class FileExplorerPanel extends JPanel {
 		treeModel = new DefaultTreeModel(root);
 
 		fileSystemView = FileSystemView.getFileSystemView();
-		// show the file system roots.
-		File[] roots = fileSystemView.getRoots();
+//		// show the file system roots.
+//		File[] roots = fileSystemView.getRoots();
+
+		File[] roots = File.listRoots();
+
 		for (File fileSystemRoot : roots) {
 			DefaultMutableTreeNode node = new DefaultMutableTreeNode(fileSystemRoot);
 			root.add(node);
-			File[] files = fileSystemView.getFiles(fileSystemRoot, true);
-
-			for (File file : sortedFiles(files)) {
-				if (file.isDirectory()) {
-					node.add(new DefaultMutableTreeNode(file));
-				}
-			}
+//			File[] files = fileSystemView.getFiles(fileSystemRoot, true);
+//
+//			for (File file : sortedFiles(files)) {
+//				if (file.isDirectory()) {
+//					node.add(new DefaultMutableTreeNode(file));
+//				}
+//			}
 			//
 		}
 
@@ -125,7 +152,6 @@ public class FileExplorerPanel extends JPanel {
 						}
 					}
 
-					LOGGER.debug("file " + ((File) node.getUserObject()).getAbsolutePath() + " refreshed");
 				}
 			}
 		};
@@ -136,22 +162,6 @@ public class FileExplorerPanel extends JPanel {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_F5) {
-//					DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree
-//							.getSelectionPath().getLastPathComponent();
-//					boolean isExpanded = tree.isExpanded(new TreePath(node));
-//					node.removeAllChildren();
-//					showChildren(node);
-//					treeModel.nodeStructureChanged(node);
-//					if (isExpanded) {
-//						tree.expandPath(new TreePath(node.getPath()));
-//					}
-//
-//					// tree.invalidate();
-//					// tree.repaint();
-//					// tree.validate();
-//					LOGGER.debug("file "
-//							+ ((File) node.getUserObject()).getAbsolutePath()
-//							+ " refreshed");
 					refreshSelection();
 				}
 			}
@@ -161,7 +171,7 @@ public class FileExplorerPanel extends JPanel {
 	/**
 	 * Refreshes the selection or the parent
 	 */
-	public void refreshSelection() {
+	protected void refreshSelection() {
 		if (tree.isSelectionEmpty()) {
 			LOGGER.debug("Nothing to refresh");
 			return;
@@ -172,17 +182,22 @@ public class FileExplorerPanel extends JPanel {
 			node = (DefaultMutableTreeNode) node.getParent();
 		}
 		boolean isExpanded = tree.isExpanded(new TreePath(node.getPath()));
+		LOGGER.debug("[" + getIdentifier() + "] Path " + new TreePath(node.getPath()) + "is expanded : " + isExpanded);
 
+		Rectangle rect = tree.getVisibleRect();
 		node.removeAllChildren();
+		selectionNotificationBlocked = true;
 		treeModel.reload(node);
-
-		jTreeValueChanged();
+		selectionNotificationBlocked = false;
+		setSelectedFolder((File)node.getUserObject());
+		tree.scrollRectToVisible(rect);
+//		jTreeValueChanged();
 
 		if (isExpanded) {
 			tree.expandPath(new TreePath(node.getPath()));
 		}
 
-		LOGGER.debug("Refreshed node " + node.getUserObject().toString());
+		LOGGER.debug("[" + getIdentifier() + "] Refreshed node " + node.getUserObject().toString());
 	}
 
 	private void jTreeValueChanged() {
@@ -197,6 +212,7 @@ public class FileExplorerPanel extends JPanel {
 
 			if (node.getChildCount() == 0) {
 				addAllChildNodes(node, file);
+				LOGGER.debug("[" + getIdentifier() + "] added node for file " + file);
 			}
 		}
 	}
@@ -279,7 +295,7 @@ public class FileExplorerPanel extends JPanel {
 		tree.addTreeSelectionListener(treeSelectionListener);
 	}
 
-	public File getSelectedFile() {
+	protected File getSelectedFile() {
 		if (tree.getSelectionPath() == null) {
 			return null;
 		}
@@ -291,19 +307,18 @@ public class FileExplorerPanel extends JPanel {
 		return (File) node.getUserObject();
 	}
 
-	public void setSelectedFolder(String folder) {
+	protected void setSelectedFolder(File folder) {
 		if (null == folder) {
 			return;
 		}
 		LOGGER.debug("selecting folder " + folder);
-		File f = new File(folder);
 		List<File> l = new ArrayList<File>();
-		l.add(f);
-		File parentFile = f.getParentFile();
+		l.add(folder);
+		File parentFile = folder.getParentFile();
 		while (parentFile != null) {
 			l.add(parentFile);
-			f = parentFile;
-			parentFile = f.getParentFile();
+			folder = parentFile;
+			parentFile = folder.getParentFile();
 		}
 		Collections.reverse(l);
 
@@ -343,5 +358,20 @@ public class FileExplorerPanel extends JPanel {
 			}
 		}
 	}
+	
+	@Override
+	public void notify(FileEvent fileEvent) {
+		int type = fileEvent.getFileEventType();
+		if (type == FileEvent.FILE_MOVED) {
+			refreshSelection();
+			// TODO : refresh the source file instead of selection
+		}else{
+			notifyCustom(fileEvent);
+		}
+	}
+
+
+
+	protected abstract void notifyCustom(FileEvent fileEvent);
 
 }

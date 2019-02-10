@@ -8,15 +8,13 @@ import java.io.File;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
 
 import org.icepdf.core.util.Defs;
 import org.icepdf.ri.common.ComponentKeyBinding;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
-import org.icepdf.ri.common.utility.annotation.BorderPanel;
 
-public class PDFViewer extends AbstractViewer {
+public class PDFDocumentViewer extends AbstractDocumentViewer {
 
 	private SwingController controller;
 	private CardLayout cardLayout;
@@ -48,7 +46,7 @@ public class PDFViewer extends AbstractViewer {
 	// See more at:
 	// http://www.icesoft.org/JForum/posts/list/20628.page#sthash.RlQw5c9V.dpuf
 
-	public PDFViewer() {
+	public PDFDocumentViewer() {
 		init();
 	}
 
@@ -90,9 +88,9 @@ public class PDFViewer extends AbstractViewer {
 		new Thread(new Runnable() {
 			
 			public void run() {
-				cardLayout.show(PDFViewer.this, "wait");
+				cardLayout.show(PDFDocumentViewer.this, "wait");
 				controller.openDocument(file.getAbsolutePath());
-				cardLayout.show(PDFViewer.this, "viewer");
+				cardLayout.show(PDFDocumentViewer.this, "viewer");
 			}
 		}).start();
 		

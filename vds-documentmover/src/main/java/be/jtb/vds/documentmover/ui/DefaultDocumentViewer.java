@@ -3,14 +3,13 @@ package be.jtb.vds.documentmover.ui;
 import java.awt.BorderLayout;
 import java.io.File;
 
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-public class DefaultViewer extends AbstractViewer {
+public class DefaultDocumentViewer extends AbstractDocumentViewer {
 
 	private JTextArea label;
 
-	public DefaultViewer() {
+	public DefaultDocumentViewer() {
 		init();
 	}
 

@@ -6,28 +6,22 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
-import be.jtb.vds.documentmover.ConfigurationHelper;
 import be.jtb.vds.documentmover.utils.FileUtils;
 import be.jtb.vds.documentmover.utils.MyParser;
+import be.jtb.vds.documentmover.utils.ResourceManager;
 
-public class ActionPanel extends JPanel {
-	private static final Logger LOGGER = Logger.getLogger(ActionPanel.class.getName());
+public class ActionView extends View {
+	private static final Logger LOGGER = Logger.getLogger(ActionView.class.getName());
 	private JTextField destFolderLabel;
 //	private DefaultComboBoxModel patternComboModel;
 //	private JComboBox senderComboBox;
@@ -39,8 +33,10 @@ public class ActionPanel extends JPanel {
 	private JTextField descriptionTextField;
 	private JTextField extensionTextField;
 
-	public ActionPanel() {
+	public ActionView(String identifier, String name) {
+		super(identifier, name);
 		initializeComponents();
+		EventManager.getInstance().registerEventListener(this);
 	}
 
 	private void initializeComponents() {
@@ -79,7 +75,7 @@ public class ActionPanel extends JPanel {
 
 		GridBagLayoutManager.addComponent(this, createMoveButton(), c, 0, 2, 7, 1, 0, 0, GridBagConstraints.NONE,
 				GridBagConstraints.CENTER);
-		
+
 		GridBagLayoutManager.addComponent(this, Box.createVerticalGlue(), c, 0, 3, 7, 1, 1, 1, GridBagConstraints.BOTH,
 				GridBagConstraints.CENTER);
 	}
@@ -100,7 +96,7 @@ public class ActionPanel extends JPanel {
 //		loadPatterns();
 //		senderComboBox = new JComboBox(patternComboModel);
 //		senderComboBox.setEditable(true);
-		
+
 		senderTextField = new JTextField();
 		extensionTextField = new JTextField();
 
@@ -165,46 +161,25 @@ public class ActionPanel extends JPanel {
 //	}
 
 	private Component createMoveButton() {
-		JButton moveBtn = new JButton(new AbstractAction("Move") {
+		JButton moveBtn = new JButton(
+				new AbstractAction("Move", ResourceManager.getInstance().getImageIcon("move_24x24.png")) {
 
-			public void actionPerformed(ActionEvent e) {
-				moveFile();
-			}
-		});
+					public void actionPerformed(ActionEvent e) {
+						moveFile();
+					}
+				});
 		return moveBtn;
 	}
 
 	private void moveFile() {
 		// String fileName = newFileNameTf.getText();
 //		String fileName = (String) senderComboBox.getSelectedItem();
-		MyParser parser = new MyParser();
-		String dtg = dtgTextField.getText();
-		if(null != dtg && dtg.length()==0) {
-			dtg = null;
-		}
+		String fileName = buildFileName();
 
-		String sender = senderTextField.getText();
-		if(null != sender && sender.length()==0) {
-			sender = null;
-		}
-		
-		String description = descriptionTextField.getText();
-		if(null != description && description.length()==0) {
-			description = null;
-		}
-		
-		String extension = extensionTextField.getText();
-		if(null != extension && extension.length()==0) {
-			extension = null;
-		}
-		parser.load(dtg, sender, description, extension);
-		String fileName = parser.getFileName();
-		
-		
 		File newFileDest = new File(destFolderLabel.getText() + File.separatorChar + fileName);
 
 		if (newFileDest.exists()) {
-			JOptionPane.showMessageDialog(ActionPanel.this,
+			JOptionPane.showMessageDialog(ActionView.this,
 					"This File already exists. Not possible to replace an existing file.");
 			return;
 		}
@@ -213,25 +188,61 @@ public class ActionPanel extends JPanel {
 		sb.append("Moving file ");
 		sb.append("\r\n  " + sourceFile.getAbsolutePath());
 		sb.append("\r\n    to " + newFileDest.getAbsolutePath());
+		LOGGER.debug(sb.toString());
 		sb.append("\r\nPlease Confirm");
-		LOGGER.info(sb.toString());
-		int i = JOptionPane.showConfirmDialog(ActionPanel.this, sb.toString());
+		int i = JOptionPane.showConfirmDialog(ActionView.this, sb.toString());
 		if (i == JOptionPane.YES_OPTION) {
 			try {
 				// documentViewerPanel.releaseFile();
 				// documentViewerPanel.showFile(newFileDest.getParentFile());
-
+				notifyFileEvent(new FileEvent(FileEvent.FILE_WILL_MOVE, sourceFile, newFileDest));
 				FileUtils.moveFile(sourceFile, newFileDest);
-				JOptionPane.showMessageDialog(ActionPanel.this, "File has been moved");
+				LOGGER.info("File moved : " + sourceFile + " >> " + newFileDest);
+				notifyFileEvent(new FileEvent(FileEvent.FILE_MOVED, sourceFile, newFileDest));
+				JOptionPane.showMessageDialog(ActionView.this, "File has been moved");
 			} catch (IOException e1) {
 				e1.printStackTrace();
-				JOptionPane.showMessageDialog(ActionPanel.this, e1.getMessage());
+				JOptionPane.showMessageDialog(ActionView.this, e1.getMessage());
 			}
 		}
 	}
 
-	public void destinationFileChanged(File file) {
+	private void notifyFileEvent(FileEvent fileEvent) {
+		EventManager.getInstance().notifyFileEvent(this, fileEvent);
+	}
+
+	private String buildFileName() {
+		MyParser parser = new MyParser();
+		String dtg = dtgTextField.getText();
+		if (null != dtg && dtg.length() == 0) {
+			dtg = null;
+		}
+
+		String sender = senderTextField.getText();
+		if (null != sender && sender.length() == 0) {
+			sender = null;
+		}
+
+		String description = descriptionTextField.getText();
+		if (null != description && description.length() == 0) {
+			description = null;
+		}
+
+		String extension = extensionTextField.getText();
+		if (null != extension && extension.length() == 0) {
+			extension = null;
+		}
+		parser.load(dtg, sender, description, extension);
+		String fileName = parser.getFileName();
+		return fileName;
+	}
+
+	private void destinationFileChanged(File file) {
 		String parentPath = null;
+		if (null == file) {
+			return;
+		}
+
 		if (file.isDirectory()) {
 			parentPath = file.getAbsolutePath();
 		} else {
@@ -240,19 +251,19 @@ public class ActionPanel extends JPanel {
 		destFolderLabel.setText(parentPath);
 
 		if (!file.isDirectory()) {
-			LoadDestinationFileParts(file.getName());
+			loadDestinationFileParts(file.getName());
 		}
 	}
 
-	public void sourceFileChanged(File file) {
+	private void sourceFileChanged(File file) {
 		sourceFile = file;
 //		if (senderComboBox.getSelectedItem() == null) {
 //			patternComboModel.setSelectedItem(sourceFile.getName());
 //		}
-		LoadDestinationFileParts(sourceFile.getName());
+		loadDestinationFileParts(sourceFile.getName());
 	}
 
-	private void LoadDestinationFileParts(String fileName) {
+	private void loadDestinationFileParts(String fileName) {
 		MyParser parser = new MyParser();
 		parser.evaluate(fileName);
 		dtgTextField.setText(parser.getDtg());
@@ -261,4 +272,13 @@ public class ActionPanel extends JPanel {
 		extensionTextField.setText(parser.getExtension());
 	}
 
+	@Override
+	public void notify(FileEvent fileEvent) {
+		int type = fileEvent.getFileEventType();
+		if (type == FileEvent.SOURCEFILE_SELECTED) {
+			sourceFileChanged(fileEvent.getSourceFile());
+		} else if (type == FileEvent.DESTINATIONFILE_SELECTED) {
+			destinationFileChanged(fileEvent.getDestinationFile());
+		}
+	}
 }

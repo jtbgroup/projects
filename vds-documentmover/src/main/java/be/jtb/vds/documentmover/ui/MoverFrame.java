@@ -1,42 +1,33 @@
 package be.jtb.vds.documentmover.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import be.jtb.vds.documentmover.ApplicationManager;
-import be.jtb.vds.documentmover.ConfigurationHelper;
 
 public class MoverFrame extends JFrame {
+	public static final String VIEW_ID_ACTIONS = "actions.controller";
+	public static final String VIEW_ID_DOCUMENTS = "documents";
+	public static final String VIEW_ID_SOURCE = "fileexplorer.source";
+	public static final String VIEW_ID_DESTINATION = "fileexplorer.destination";
 	private ApplicationManager applicationManager;
-	private MoverPanel moverPanel;
-	private File sourceFile;
-	private DocumentViewerPanel documentViewerPanel;
-	private JPanel sourceExplorerPanel;
-	private FileExplorerPanel destinationExplorer;
-	private JPanel destinationExplorerPanel;
-	private FileExplorerPanel sourceExplorer;
-	private ActionPanel actionPanel;
+	private DocumentView documentViewerPanel;
+	private AbstractFileExplorerView destinationExplorer;
+	private AbstractFileExplorerView sourceExplorer;
+	private ActionView actionPanel;
+	private Map<String, View> views = new HashMap<String, View>();
 
 	public MoverFrame(ApplicationManager applicationManager) {
 		this.applicationManager = applicationManager;
 		intializeFrame();
 	}
-	
+
 	private void intializeFrame() {
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setJMenuBar(createMenuBar());
@@ -44,9 +35,6 @@ public class MoverFrame extends JFrame {
 		addWindowListener(createWindowsListener());
 
 		initializeComponents();
-
-		// getContentPane().add(createContent());
-		loadDefaultValues();
 	}
 
 	private void initializeComponents() {
@@ -58,51 +46,27 @@ public class MoverFrame extends JFrame {
 	}
 
 	private void initializeActionPanel() {
-		actionPanel = new ActionPanel();
+		actionPanel = new ActionView(VIEW_ID_ACTIONS, "Actions");
+		registerView(actionPanel);
+	}
+
+	private void registerView(View view) {
+		views.put(view.getIdentifier(), view);
 	}
 
 	private void initializeDocumentViewerPanel() {
-		documentViewerPanel = new DocumentViewerPanel();
+		documentViewerPanel = new DocumentView(VIEW_ID_DOCUMENTS, "Documents");
+		registerView(documentViewerPanel);
 	}
 
 	private void initializeSourceExplorer() {
-		sourceExplorer = new FileExplorerPanel(true);
-		sourceExplorer.addTreeSelectionListener(new TreeSelectionListener() {
-
-			public void valueChanged(TreeSelectionEvent tse) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
-				sourceFileChanged((File) node.getUserObject());
-
-			}
-		});
-		sourceExplorer.setMinimumSize(new Dimension(200, 200));
-
-		sourceExplorerPanel = new JPanel(new BorderLayout());
-		sourceExplorerPanel.add(sourceExplorer, BorderLayout.CENTER);
+		sourceExplorer = new SourceFileExplorerView(VIEW_ID_SOURCE, "Source", true);
+		registerView(sourceExplorer);
 	}
 
 	private void initializeDestinationExplorer() {
-		destinationExplorer = new FileExplorerPanel(true);
-		destinationExplorer.addTreeSelectionListener(new TreeSelectionListener() {
-
-			public void valueChanged(TreeSelectionEvent tse) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) tse.getPath().getLastPathComponent();
-				// destinationNode = node;
-				destinationFileChanged((File) node.getUserObject());
-			}
-		});
-		destinationExplorerPanel = new JPanel(new BorderLayout());
-		destinationExplorerPanel.add(destinationExplorer, BorderLayout.CENTER);
-	}
-
-	private void destinationFileChanged(File file) {
-		actionPanel.destinationFileChanged(file);
-
-	}
-
-	private void sourceFileChanged(File file) {
-		documentViewerPanel.showFile(file);
-		actionPanel.sourceFileChanged(file);
+		destinationExplorer = new DestinationFileExplorerView(VIEW_ID_DESTINATION, "Destination", true);
+		registerView(destinationExplorer);
 	}
 
 	private JMenuBar createMenuBar() {
@@ -110,16 +74,6 @@ public class MoverFrame extends JFrame {
 		return menuBar;
 	}
 
-	private void loadDefaultValues() {
-		// moverPanel.setDestinationFolder(ConfigurationHelper.getInstance()
-		// .getDestinationFolder());
-		// moverPanel.setSourceFolder(ConfigurationHelper.getInstance()
-		// .getSourceFolder());
-
-		destinationExplorer.setSelectedFolder(ConfigurationHelper.getInstance().getDestinationFolder());
-		sourceExplorer.setSelectedFolder(ConfigurationHelper.getInstance().getSourceFolder());
-
-	}
 
 	private WindowListener createWindowsListener() {
 		WindowAdapter wa = new WindowAdapter() {
@@ -131,25 +85,9 @@ public class MoverFrame extends JFrame {
 		return wa;
 	}
 
-	// private JComponent createContent() {
-	// moverPanel = new MoverPanel();
-	// return moverPanel;
-	// }
 
-	public JPanel getFileExplorerSourcePanel() {
-		return sourceExplorerPanel;
-	}
-
-	public JPanel getDocumentViewerPanel() {
-		return documentViewerPanel;
-	}
-
-	public JPanel getFileExplorerDestinationPanel() {
-		return destinationExplorerPanel;
-	}
-
-	public JPanel getActionPanel() {
-		return actionPanel;
+	public View getView(String identifier) {
+		return views.get(identifier);
 	}
 
 }
