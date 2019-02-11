@@ -1,18 +1,27 @@
 package be.jtb.vds.documentmover.ui;
 
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
 import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.intern.CDockable;
 
 public class DockingLayoutManager {
 
+	public static final String VIEW_ID_ACTIONS = "actions.controller";
+	public static final String VIEW_ID_DOCUMENTS = "documents";
+	public static final String VIEW_ID_SOURCE = "fileexplorer.source";
+	public static final String VIEW_ID_DESTINATION = "fileexplorer.destination";
 	private MoverFrame parentFrame;
 	private CControl control;
+	private Map<String, SingleCDockable> views = new HashMap<String, SingleCDockable>();
 
 	public DockingLayoutManager(MoverFrame parentFrame) {
 		this.parentFrame = parentFrame;
@@ -28,62 +37,76 @@ public class DockingLayoutManager {
 
 	private void initDefaultLayout() {
 
-		SingleCDockable dock1 = createFileViewerDock();
-		SingleCDockable dock2 = createFileBrowserSourceDock();
-		SingleCDockable dock3 = createFileBrowserDestinationDock();
-		SingleCDockable dock4 = createActionDock();
+		SingleCDockable docDock = createDocumentViewerDock();
+		SingleCDockable sourceDock = createFileBrowserSourceDock();
+		SingleCDockable destDock = createFileBrowserDestinationDock();
+		SingleCDockable actionsDock = createActionDock();
 
-		control.addDockable(dock1);
-		control.addDockable(dock2);
-		control.addDockable(dock3);
-		control.addDockable(dock4);
+		control.addDockable(docDock);
+		control.addDockable(sourceDock);
+		control.addDockable(destDock);
+		control.addDockable(actionsDock);
 
-		dock1.setVisible(true);
-		dock2.setLocation(CLocation.base().normalWest(0.20));
-		dock2.setVisible(true);
-		dock3.setLocation(CLocation.base().normalWest(0.20).south(0.5));
-		dock3.setVisible(true);
-		dock4.setLocation(CLocation.base().normalSouth(0.3));
-		dock4.setVisible(true);
+		CGrid grid = new CGrid(control);
+		grid.add(0, 0, 3, 5, sourceDock);
+		grid.add(0, 5, 3, 5, destDock);
+		grid.add(3, 0, 7, 8, docDock);
+		grid.add(3, 8, 7, 2, actionsDock);
 
-		
-//		RootMenuPiece menu = new RootMenuPiece("Colors", false);
-//		menu.add(new SingleCDockableListMenuPiece(control));
-//		JMenuBar menuBar = new JMenuBar();
-//		menuBar.add(menu.getMenu());
-//		parentFrame.setJMenuBar(menuBar);
+		control.getContentArea().deploy(grid);
+
+		docDock.setLocation(CLocation.base().normalWest(0.7).north(0.8));
+		docDock.setVisible(true);
+		sourceDock.setLocation(CLocation.base().normalEast(0.20).north(0.5));
+		sourceDock.setVisible(true);
+		destDock.setLocation(CLocation.base().normalEast(0.20).south(0.5));
+		destDock.setVisible(true);
+		actionsDock.setLocation(CLocation.base().normalWest(0.7).south(0.2));
+		actionsDock.setVisible(true);
 	}
 
-
 	private SingleCDockable createActionDock() {
-		View producer = parentFrame.getView(MoverFrame.VIEW_ID_ACTIONS);
-		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				producer.getIdentifier(), producer.getName(), producer);
-		dockable.setCloseable(true);
+		if(views.get(VIEW_ID_ACTIONS) != null) {
+			return views.get(VIEW_ID_ACTIONS);
+		}
+		
+		ActionView actionPanel = new ActionView(VIEW_ID_ACTIONS, "Actions");
+		DefaultSingleCDockable dockable = createCDockable(actionPanel);
 		return dockable;
 	}
 
 	private SingleCDockable createFileBrowserDestinationDock() {
-		View producer = parentFrame.getView(MoverFrame.VIEW_ID_DESTINATION);
-		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				producer.getIdentifier(), producer.getName(), producer);
-		dockable.setCloseable(true);
+		if(views.get(VIEW_ID_DESTINATION) != null) {
+			return views.get(VIEW_ID_DESTINATION);
+		}
+		
+		DestinationFileExplorerView destinationExplorer = new DestinationFileExplorerView(VIEW_ID_DESTINATION, "Destination", true);
+		DefaultSingleCDockable dockable = createCDockable(destinationExplorer);
 		return dockable;
 	}
 
 	private SingleCDockable createFileBrowserSourceDock() {
-		View producer = parentFrame.getView(MoverFrame.VIEW_ID_SOURCE);
-		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				producer.getIdentifier(), producer.getName(), producer);
-		dockable.setCloseable(true);
+		if(views.get(VIEW_ID_SOURCE) != null) {
+			return views.get(VIEW_ID_SOURCE);
+		}
+		SourceFileExplorerView sourceExplorer = new SourceFileExplorerView(VIEW_ID_SOURCE, "Source", true);
+		DefaultSingleCDockable dockable = createCDockable(sourceExplorer);
 		return dockable;
 	}
 
-	private SingleCDockable createFileViewerDock() {
-		View producer = parentFrame.getView(MoverFrame.VIEW_ID_DOCUMENTS);
-		DefaultSingleCDockable dockable = new DefaultSingleCDockable(
-				producer.getIdentifier(), producer.getName(), producer);
+	private DefaultSingleCDockable createCDockable(View view) {
+		DefaultSingleCDockable dockable = new DefaultSingleCDockable(view.getIdentifier(), view.getName(), view);
 		dockable.setCloseable(true);
+		views.put(view.getIdentifier(), dockable);
+		return dockable;
+	}
+
+	private SingleCDockable createDocumentViewerDock() {
+		if(views.get(VIEW_ID_DOCUMENTS) != null) {
+			return views.get(VIEW_ID_DOCUMENTS);
+		}
+		DocumentView documentViewerPanel = new DocumentView(VIEW_ID_DOCUMENTS, "Documents");
+		DefaultSingleCDockable dockable = createCDockable(documentViewerPanel);
 		return dockable;
 	}
 
@@ -91,9 +114,33 @@ public class DockingLayoutManager {
 		JPanel panel = new JPanel();
 		panel.setOpaque(true);
 		panel.setBackground(color);
-		DefaultSingleCDockable dockable = new DefaultSingleCDockable(title,
-				title, panel);
+		DefaultSingleCDockable dockable = new DefaultSingleCDockable(title, title, panel);
 		dockable.setCloseable(true);
 		return dockable;
+	}
+
+	public void showView(String viewId) {
+		SingleCDockable dock = null;
+		
+		switch (viewId) {
+		case VIEW_ID_ACTIONS:
+			dock = createActionDock();
+			break;
+		case VIEW_ID_DESTINATION:
+			dock = createFileBrowserDestinationDock();
+			break;
+		case VIEW_ID_SOURCE:
+			dock = createFileBrowserSourceDock();
+			break;
+		case VIEW_ID_DOCUMENTS:
+			dock = createDocumentViewerDock();
+			break;
+		default:
+			dock = createActionDock();
+			break;
+		}
+		
+		dock.setVisible(true);
+		dock.getFocusComponent();
 	}
 }

@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 
 import org.apache.log4j.Logger;
 
+import be.jtb.vds.documentmover.ui.event.EventManager;
 import be.jtb.vds.documentmover.utils.FileUtils;
 import be.jtb.vds.documentmover.utils.MessageHelper;
 import be.jtb.vds.documentmover.utils.MyParser;

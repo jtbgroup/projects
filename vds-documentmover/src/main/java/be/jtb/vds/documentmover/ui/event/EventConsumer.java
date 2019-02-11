@@ -1,4 +1,6 @@
-package be.jtb.vds.documentmover.ui;
+package be.jtb.vds.documentmover.ui.event;
+
+import be.jtb.vds.documentmover.ui.FileEvent;
 
 public interface EventConsumer {
 	

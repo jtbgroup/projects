@@ -10,9 +10,9 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
-import be.jtb.vds.documentmover.ui.EventManager;
-import be.jtb.vds.documentmover.ui.EventProducer;
 import be.jtb.vds.documentmover.ui.MoverFrame;
+import be.jtb.vds.documentmover.ui.event.EventManager;
+import be.jtb.vds.documentmover.ui.event.EventProducer;
 import be.jtb.vds.documentmover.utils.ConfigurationHelper;
 import be.jtb.vds.documentmover.utils.MessageHelper;
 

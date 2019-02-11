@@ -23,6 +23,8 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
+import be.jtb.vds.documentmover.ui.event.EventManager;
+import be.jtb.vds.documentmover.ui.event.EventProducer;
 import be.jtb.vds.documentmover.utils.ConfigurationHelper;
 import be.jtb.vds.documentmover.utils.ResourceManager;
 

@@ -1,4 +1,4 @@
-package be.jtb.vds.documentmover.ui;
+package be.jtb.vds.documentmover.ui.event;
 
 public interface EventProducer {
 	

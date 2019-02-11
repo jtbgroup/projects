@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import be.jtb.vds.documentmover.ui.event.EventManager;
+
 public class DocumentView extends View {
 	private static final Logger LOGGER = Logger
 			.getLogger(DocumentView.class.getName());

@@ -4,6 +4,9 @@ import javax.swing.JPanel;
 
 import org.apache.log4j.Logger;
 
+import be.jtb.vds.documentmover.ui.event.EventConsumer;
+import be.jtb.vds.documentmover.ui.event.EventProducer;
+
 public abstract class View extends JPanel implements EventProducer, EventConsumer{
 
 	private static final Logger LOGGER = Logger.getLogger(View.class);

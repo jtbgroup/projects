@@ -15,14 +15,17 @@ import be.jtb.vds.documentmover.ApplicationManager;
 public class MoverMenuBar extends JMenuBar {
 
 	private ApplicationManager applicationManager;
+	private DockingLayoutManager dockingLayoutManager;
 
-	public MoverMenuBar(ApplicationManager applicationManager) {
+	public MoverMenuBar(ApplicationManager applicationManager, DockingLayoutManager dockingLayoutManager) {
 		this.applicationManager = applicationManager;
+		this.dockingLayoutManager = dockingLayoutManager;
 		initComponent();
 	}
 
 	private void initComponent() {
 		this.add(createFileMenu());
+		this.add(createViewsMenu());
 	}
 
 	private JMenu createFileMenu() {
@@ -31,6 +34,28 @@ public class MoverMenuBar extends JMenuBar {
 	fileMenu.add(createExitMenuItem());
 	
 	return fileMenu;
+	}
+	
+	private JMenu createViewsMenu() {
+		JMenu fileMenu = new JMenu("Views");
+		fileMenu.add(createViewMenu("Actions",DockingLayoutManager.VIEW_ID_ACTIONS));
+		fileMenu.add(createViewMenu("Source",DockingLayoutManager.VIEW_ID_SOURCE));
+		fileMenu.add(createViewMenu("Destination",DockingLayoutManager.VIEW_ID_DESTINATION));
+		fileMenu.add(createViewMenu("Documents",DockingLayoutManager.VIEW_ID_DOCUMENTS));
+		
+		return fileMenu;
+		}
+
+	private JMenuItem createViewMenu(String title, String viewId) {
+		AbstractAction action = new AbstractAction(title) {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				dockingLayoutManager.showView(viewId);
+			}
+		};
+		JMenuItem menuItem = new JMenuItem(action);
+		return menuItem;
 	}
 
 	private JMenuItem createPreferencesMenuItem() {

@@ -18,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import be.jtb.vds.documentmover.ui.event.EventManager;
+import be.jtb.vds.documentmover.ui.event.EventProducer;
 import be.jtb.vds.documentmover.utils.ConfigurationHelper;
 
 public class PreferenceDialog extends JDialog {

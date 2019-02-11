@@ -1,5 +1,7 @@
 package be.jtb.vds.documentmover.ui;
 
+import be.jtb.vds.documentmover.ui.event.EventManager;
+
 public class SourceFileExplorerView extends AbstractFileExplorerView {
 
 	public SourceFileExplorerView(String identifier, String name, boolean filesVisible) {

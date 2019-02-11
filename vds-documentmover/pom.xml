@@ -45,7 +45,12 @@
 		<dependency>
 			<groupId>org.dockingframes</groupId>
 			<artifactId>docking-frames-common</artifactId>
-			<version>1.1.1</version>
+			<version>1.1.2p20c</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dockingframes</groupId>
+			<artifactId>docking-frames-core</artifactId>
+			<version>1.1.2p20c</version>
 		</dependency>
 
 		<dependency>
@@ -75,12 +80,6 @@
 		</dependency>
 
 
-<!-- for test pursposes -->
-		<dependency>
-			<groupId>com.miglayout</groupId>
-			<artifactId>miglayout</artifactId>
-			<version>3.7.4</version>
-		</dependency>
 	</dependencies>
 
 

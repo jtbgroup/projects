@@ -1,10 +1,12 @@
-package be.jtb.vds.documentmover.ui;
+package be.jtb.vds.documentmover.ui.event;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import be.jtb.vds.documentmover.ui.FileEvent;
 
 public class EventManager {
 	private static final Logger LOGGER = Logger.getLogger(EventManager.class);
