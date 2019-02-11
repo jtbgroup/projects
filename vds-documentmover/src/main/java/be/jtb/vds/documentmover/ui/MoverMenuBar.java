@@ -42,6 +42,7 @@ public class MoverMenuBar extends JMenuBar {
 		fileMenu.add(createViewMenu("Source",DockingLayoutManager.VIEW_ID_SOURCE));
 		fileMenu.add(createViewMenu("Destination",DockingLayoutManager.VIEW_ID_DESTINATION));
 		fileMenu.add(createViewMenu("Documents",DockingLayoutManager.VIEW_ID_DOCUMENTS));
+		fileMenu.add(createViewMenu("Preferences",DockingLayoutManager.VIEW_ID_PREFERENCES));
 		
 		return fileMenu;
 		}

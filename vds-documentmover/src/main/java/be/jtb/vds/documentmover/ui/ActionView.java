@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import be.jtb.vds.documentmover.ui.event.EventManager;
 import be.jtb.vds.documentmover.utils.FileUtils;
 import be.jtb.vds.documentmover.utils.MessageHelper;
-import be.jtb.vds.documentmover.utils.MyParser;
+import be.jtb.vds.documentmover.utils.FileNameParser;
 import be.jtb.vds.documentmover.utils.ResourceManager;
 
 public class ActionView extends View {
@@ -149,7 +149,7 @@ public class ActionView extends View {
 	}
 
 	private String buildFileName() {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		String dtg = dtgTextField.getText();
 		if (null != dtg && dtg.length() == 0) {
 			dtg = null;
@@ -200,7 +200,7 @@ public class ActionView extends View {
 	}
 
 	private void loadDestinationFileParts(String fileName) {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		parser.evaluate(fileName);
 		dtgTextField.setText(parser.getDtg());
 		senderTextField.setText(parser.getSender());

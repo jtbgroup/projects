@@ -45,12 +45,12 @@
 		<dependency>
 			<groupId>org.dockingframes</groupId>
 			<artifactId>docking-frames-common</artifactId>
-			<version>1.1.2p20c</version>
+			<version>1.1.2-P20c</version>
 		</dependency>
 		<dependency>
 			<groupId>org.dockingframes</groupId>
 			<artifactId>docking-frames-core</artifactId>
-			<version>1.1.2p20c</version>
+			<version>1.1.2-P20c</version>
 		</dependency>
 
 		<dependency>

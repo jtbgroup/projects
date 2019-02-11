@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
-import be.jtb.vds.documentmover.utils.MyParser;
+import be.jtb.vds.documentmover.utils.FileNameParser;
 
 public class MyParserTest {
 
 	@Test
 	public void testEvaluate() {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		parser.evaluate("2018_SENDER_example.pdf");
 		assertEquals("example", parser.getDescription());
 		assertEquals("2018", parser.getDtg());
@@ -40,7 +40,7 @@ public class MyParserTest {
 
 	@Test
 	public void testGetExtension() {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		parser.evaluate("example.pdf");
 		assertEquals("pdf", parser.getExtension());
 		parser.evaluate("example.doc");
@@ -53,14 +53,14 @@ public class MyParserTest {
 
 	@Test
 	public void testFileName() {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		parser.evaluate("example.pdf");
 		assertEquals("example.pdf", parser.getFileName());
 	}
 
 	@Test
 	public void testGetDTG() {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		parser.evaluate("2018_SENDER_example.pdf");
 		assertEquals("2018", parser.getDtg());
 		parser.evaluate("20180101_SENDER_example.pdf");
@@ -71,7 +71,7 @@ public class MyParserTest {
 
 	@Test
 	public void testGetSender() {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		parser.evaluate("2018_SENDER_example.pdf");
 		assertEquals("SENDER", parser.getSender());
 		parser.evaluate("2018_SENDER 2_example.pdf");
@@ -84,7 +84,7 @@ public class MyParserTest {
 
 	@Test
 	public void testGetDescription() {
-		MyParser parser = new MyParser();
+		FileNameParser parser = new FileNameParser();
 		parser.evaluate("2018_SENDER_example.pdf");
 		assertEquals("example", parser.getDescription());
 		parser.evaluate("2018_SENDER_example-abc.pdf");
