@@ -10,10 +10,11 @@ public class FileNameParser {
 	private String dtg;
 	private String sender;
 	private String description;
-	private static final String PATTERN_DTG_SEN_DESC = "(\\d{4,8})_([a-zA-Z0-9 &]*[a-zA-Z][a-zA-Z0-9 &]*)_(.*)";
-	private static final String PATTERN_DTG_SEN = "(\\d{4,8})_([a-zA-Z0-9 &]*[a-zA-Z][a-zA-Z0-9 &]*)";
+	private static final String senderPattern = "([a-zA-Z0-9&]*[a-z A-Z][a-zA-Z0-9&]*)";
+	private static final String PATTERN_DTG_SEN_DESC = "(\\d{4,8})_" + senderPattern + "_(.*)";
+	private static final String PATTERN_DTG_SEN = "(\\d{4,8})_" + senderPattern;
 	private static final String PATTERN_DTG_DESC = "(\\d{4,8})_(.*)";
-	private static final String PATTERN_SEN_DESC = "([a-zA-Z0-9 &]*[a-zA-Z][a-zA-Z0-9 &]*)_(.*)";
+	private static final String PATTERN_SEN_DESC = senderPattern + "_(.*)";
 
 	public void evaluate(String fileName) {
 		clear();
@@ -95,18 +96,18 @@ public class FileNameParser {
 		this.sender = sender;
 		this.description = description;
 		this.extension = extension;
-		
+
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.dtg==null?"":this.dtg);
-		if(this.dtg != null && (null != this.sender || null != description)) {
+		sb.append(this.dtg == null ? "" : this.dtg);
+		if (this.dtg != null && (null != this.sender || null != description)) {
 			sb.append("_");
 		}
-		sb.append(this.sender==null?"":this.sender);
-		if(this.sender != null && null != description) {
+		sb.append(this.sender == null ? "" : this.sender);
+		if (this.sender != null && null != description) {
 			sb.append("_");
 		}
-		sb.append(description==null?"":this.description);
-		if(null != extension) {
+		sb.append(description == null ? "" : this.description);
+		if (null != extension) {
 			sb.append(".").append(extension);
 		}
 		this.fileName = sb.toString();
