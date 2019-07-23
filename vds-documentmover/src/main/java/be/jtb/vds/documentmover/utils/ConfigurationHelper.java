@@ -54,18 +54,36 @@ public class ConfigurationHelper {
 	}
 
 	public String getDestinationFolder() {
-		return properties.getProperty("dest.folder");
+		String prop = properties.getProperty("dest.folder");
+		if (null == prop) {
+			prop = System.getProperty("user.home");
+			setDestinationFolder(prop);
+		}
+		return prop;
 	}
 
 	public String getSourceFolder() {
-		return properties.getProperty("src.folder");
+		String prop = properties.getProperty("src.folder");
+		if (null == prop) {
+			prop = System.getProperty("user.home");
+			setSourceFolder(prop);
+		}
+		return prop;
 	}
 
 	public void loadConfig() throws IOException {
 		File cf = new File(CONFIG_FILE);
 		if (cf.exists()) {
 			properties.load(new FileInputStream(cf));
+		} else {
+			loadDefaultValues();
+			saveConfig();
 		}
+	}
+
+	private void loadDefaultValues() {
+		setDestinationFolder(System.getProperty("user.home"));
+		setSourceFolder(System.getProperty("user.home"));
 	}
 
 	public void setFilePatterns(List<String> filePatterns) {
@@ -95,7 +113,9 @@ public class ConfigurationHelper {
 		String[] entries = props.split(";");
 		for (String entry : entries) {
 			String[] split = entry.split(">");
-			favorites.add(new Favorite(split[0], split[1]));
+			if (entry.length() > 0 && split.length == 2) {
+				favorites.add(new Favorite(split[0], split[1]));
+			}
 		}
 		Collections.sort(favorites);
 		return favorites;
@@ -104,7 +124,7 @@ public class ConfigurationHelper {
 	public void setFavorites(List<Favorite> favorites) {
 		StringBuilder sb = new StringBuilder();
 		int count = favorites.size() - 1;
-		for (Favorite favorite: favorites) {
+		for (Favorite favorite : favorites) {
 			sb.append(favorite.getName() + ">" + favorite.getPath());
 			if (count-- > 0) {
 				sb.append(";");

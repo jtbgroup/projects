@@ -5,71 +5,97 @@
 	<groupId>be.jtb.vds</groupId>
 	<artifactId>documentmover</artifactId>
 	<version>0.1.0</version>
-	<!-- <repositories> -->
-	<!-- <repository> -->
-	<!-- <id>ice-maven-release</id> -->
-	<!-- <name>Ice Maven Release Repository</name> -->
-	<!-- <url>http://anonsvn.icesoft.org/repo/maven2/releases</url> -->
-	<!-- </repository> -->
-	<!-- </repositories> -->
+
 
 
 	<repositories>
-		<repository>
-			<id>anonsvn.icesoft.org</id>
-			<name>ICEsoft repository</name>
-			<url>http://anonsvn.icesoft.org/repo/maven2/releases/</url>
-		</repository>
+<!-- 		<repository> -->
+<!-- 			<id>anonsvn.icesoft.org</id> -->
+<!-- 			<name>ICEsoft repository</name> -->
+<!-- 			<url>http://anonsvn.icesoft.org/repo/maven2/releases/</url> -->
+<!-- 		</repository> -->
 
 		<repository>
 			<id>jboss.org</id>
 			<name>JBoss repository</name>
 			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
 		</repository>
+
+		<repository>
+			<id>sonatype-oss-snapshots</id>
+			<name>Sonatype OSS Maven Repository for Staging Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 
-	<dependencies>
-		<dependency>
-			<groupId>org.icepdf.os</groupId>
-			<artifactId>icepdf-core</artifactId>
-			<version>6.2.2</version>
-		</dependency>
+<dependencies>
 
-		<dependency>
-			<groupId>org.icepdf.os</groupId>
-			<artifactId>icepdf-viewer</artifactId>
-			<version>6.2.2</version>
-		</dependency>
+	<!-- <dependency> -->
+	<!-- <groupId>org.dockingframes</groupId> -->
+	<!-- <artifactId>docking-frames-common</artifactId> -->
+	<!-- <version>1.1.2p6a</version> -->
+	<!-- </dependency> -->
+	<!-- <dependency> -->
+	<!-- <groupId>org.dockingframes</groupId> -->
+	<!-- <artifactId>docking-frames-core</artifactId> -->
+	<!-- <version>1.1.2p6a</version> -->
+	<!-- </dependency> -->
 
-		<dependency>
-			<groupId>org.dockingframes</groupId>
-			<artifactId>docking-frames-common</artifactId>
-			<version>1.1.2-P20c</version>
-		</dependency>
-		<dependency>
-			<groupId>org.dockingframes</groupId>
-			<artifactId>docking-frames-core</artifactId>
-			<version>1.1.2-P20c</version>
-		</dependency>
+	<!-- <dependency> -->
+	<!-- <groupId>org.dockingframes</groupId> -->
+	<!-- <artifactId>docking-frames-base</artifactId> -->
+	<!-- <version>1.1.2p6a</version> -->
+	<!-- </dependency> -->
 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.12</version>
-		</dependency>
+	<dependency>
+		<groupId>org.dockingframes</groupId>
+		<artifactId>docking-frames-common</artifactId>
+		<version>1.1.2-SNAPSHOT</version>
+	</dependency>
 
-		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jai_imageio</artifactId>
-			<version>1.1</version>
-		</dependency>
 
-		<dependency>
-			<groupId>com.levigo.jbig2</groupId>
-			<artifactId>levigo-jbig2-imageio</artifactId>
-			<version>2.0</version>
-		</dependency>
+	<dependency>
+		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+		<version>1.2.12</version>
+	</dependency>
+
+	<dependency>
+		<groupId>javax.media</groupId>
+		<artifactId>jai_imageio</artifactId>
+		<version>1.1.1</version>
+	</dependency>
+
+	<dependency>
+		<groupId>javax.media</groupId>
+		<artifactId>jai-core</artifactId>
+		<version>1.1.3</version>
+	</dependency>
+
+	<dependency>
+		<groupId>com.levigo.jbig2</groupId>
+		<artifactId>levigo-jbig2-imageio</artifactId>
+		<version>2.0</version>
+	</dependency>
+
+	<dependency>  
+	    <groupId>org.pdf4j.icepdf</groupId>  
+	    <artifactId>pdf4j-icepdf-core</artifactId>  
+	    <version>6.1.1</version>  
+	</dependency>  
+	<dependency>  
+    <groupId>org.pdf4j.icepdf</groupId>  
+    <artifactId>pdf4j-icepdf-viewer</artifactId>  
+    <version>6.1.1</version>  
+</dependency> 
+	
 
 		<!-- junit 5, unit test -->
 		<dependency>
